@@ -19,12 +19,12 @@ AJ_SERVICE_NAME:=ControlPanel
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_VERSION:=1.0.1
+PKG_VERSION:=14.02.00
 PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tgz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
 PKG_SOURCE_URL:=https://allseenalliance.org/sites/default/files/resources/
-PKG_MD5SUM:=e5d0278eabca509282bbbd026d292d3f
+PKG_MD5SUM:=8a208d5319369d8ed533a2c375d0bf68
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
