@@ -1,0 +1,42 @@
+From db99da5f049135f72979f970b635bf0da0ab1eba Mon Sep 17 00:00:00 2001
+From: Steve Kinneberg <stevek@qce.qualcomm.com>
+Date: Wed, 21 May 2014 12:39:59 -0700
+Subject: [PATCH 2/2] ASACORE-222: Close STDIO file descriptors in
+ alljoyn-daemon after forking
+
+Change-Id: I51413391791b257b048afb54db448428420825c5
+Signed-off-by: Steve Kinneberg <stevek@qce.qualcomm.com>
+---
+ alljoyn_core/router/posix/daemon-main.cc | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/alljoyn_core/router/posix/daemon-main.cc b/alljoyn_core/router/posix/daemon-main.cc
+index 9fa1706..0b6e443 100644
+--- a/alljoyn_core/router/posix/daemon-main.cc
++++ b/alljoyn_core/router/posix/daemon-main.cc
+@@ -639,6 +639,14 @@ int daemon(OptParse& opts) {
+         }
+     }
+ 
++    close(STDIN_FILENO);
++    if (LoggerSetting::GetLoggerSetting()->GetFile() != stdout) {
++        close(STDOUT_FILENO);
++    }
++    if (LoggerSetting::GetLoggerSetting()->GetFile() != stderr) {
++        close(STDERR_FILENO);
++    }
++
+     sigfillset(&waitmask);
+     sigdelset(&waitmask, SIGHUP);
+     sigdelset(&waitmask, SIGINT);
+@@ -800,6 +808,7 @@ int main(int argc, char** argv, char** env)
+                 DaemonConfig::Release();
+                 return DAEMON_EXIT_SESSION_ERROR;
+             }
++            chdir("/tmp");
+         }
+     }
+ 
+-- 
+1.9.1
+
