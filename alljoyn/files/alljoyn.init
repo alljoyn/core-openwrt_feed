@@ -92,9 +92,7 @@ process_ip_transport() {
 	local addr="0.0.0.0"
 
 	if check ip advertise_daemon; then
-	    export ${NO_EXPORT:+-n} ip_advertise_daemon="<tcp>
-    <property router_advertisement_prefix=\"org.alljoyn.BusNode.\"/>
-  </tcp>"
+	    export ${NO_EXPORT:+-n} ip_advertise_daemon="<property name=\"router_advertisement_prefix\">org.alljoyn.BusNode.</property>"
 	fi
 
 	process_networks ip
@@ -117,7 +115,7 @@ process_slap_transport() {
 	local baud
 
 	config_get path slap path "/dev/ttyUSB0"
-	config_get_bool baud slap baud "115200"
+	config_get baud slap baud "115200"
 	config_get databits slap databits "8"
 	config_get parity slap parity "none"
 	config_get stopbits slap stopbits "1"
@@ -137,8 +135,23 @@ generate_conf_file() {
     local ip_networks=""
     local ip_advertise_daemon=""
 
+    local ifc_up=""
+    local ifc=""
+
     include /lib/network
-    scan_interfaces
+
+    config_load alljoyn
+
+    config_get ifc ip networks_ITEM1
+    while [ -z "$ifc_up" ]; do
+        scan_interfaces
+        config_get ifc_up "${ifc}" up
+        if [ -z "$ifc_up" ]; then
+            sleep 2
+        fi
+    done
+
+    # Need to reload the alljoyn config since scan_interfaces clears ip_networks
     config_load alljoyn
 
     process_unix_transport
@@ -155,14 +168,12 @@ generate_conf_file() {
   <pidfile>${SERVICE_PID_FILE}</pidfile>
   ${listen_specs}
   ${ip_advertise_daemon}
-  <ip_name_service>
-    <property interfaces="${ip_networks}"/>
-  </ip_name_service>
-  <limit max_incomplete_connections="${ip_max_incomplete_conn}"/>
-  <limit max_completed_connections="${ip_max_complete_conn}"/>
-  <limit auth_timeout="${ip_auth_timeout}"/>
-  <property restrict_untrusted_clients="false"/>
-  <limit max_untrusted_clients="${ip_max_complete_conn}"/>
+  <property name="ns_interfaces">${ip_networks}</property>
+  <limit name="auth_timeout">${ip_auth_timeout}</limit>
+  <limit name="max_incomplete_connections">${ip_max_incomplete_conn}</limit>
+  <limit name="max_completed_connections">${ip_max_complete_conn}</limit>
+  <limit name="max_untrusted_clients">${ip_max_complete_conn}</limit>
+  <flag name="restrict_untrusted_clients">false</flag>
 </busconfig>
 EOF
 }

@@ -1,27 +1,14 @@
-# Copyright (c) 2012-2013, AllSeen Alliance. All rights reserved.
-#
-#    Permission to use, copy, modify, and/or distribute this software for any
-#    purpose with or without fee is hereby granted, provided that the above
-#    copyright notice and this permission notice appear in all copies.
-#
-#    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-#    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-#    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-#    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-#    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-#    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-#    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
-PKG_VERSION:=14.02.00
-PKG_RELEASE:=2
+PKG_VERSION:=0.0.1406
+PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/sites/default/files/resources/
-PKG_MD5SUM:=5c8ca6ff6b7480c9e108dc5a96dcfe0a
+PKG_SOURCE_URL:=https://build.allseenalliance.org/ci/view/src/job/source-extraction/lastSuccessfulBuild/artifact/depot/
+PKG_MD5SUM:=
+
+
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
@@ -146,8 +133,9 @@ define Build/Compile
 		"SERVICES=$(ALLJOYN_SERVICES)" \
 		"BUILD_SERVICES_SAMPLES=$(ALLJOYN_BUILD_SERVICES_SAMPLES)" \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)" \
-		BD=off \
+		BR=off \
 		ICE=off \
+		POLICYDB=on \
 		"TARGET_CC=$$(TARGET_CC)" \
 		"TARGET_CXX=$$(TARGET_CXX)" \
 		"TARGET_CFLAGS=$$(TARGET_CFLAGS)" \
@@ -234,7 +222,6 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bignum $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/compression $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/keystore $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/ledctrl $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/marshal $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/names $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/ns $(1)/usr/bin/

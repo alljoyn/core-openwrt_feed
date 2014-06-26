@@ -1,30 +1,15 @@
-# Copyright (c) 2013, AllSeen Alliance. All rights reserved.
-#
-#    Permission to use, copy, modify, and/or distribute this software for any
-#    purpose with or without fee is hereby granted, provided that the above
-#    copyright notice and this permission notice appear in all copies.
-#
-#    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-#    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-#    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-#    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-#    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-#    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-#    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-
 AJ_SERVICE:=notification
 AJ_SERVICE_NAME:=Notification
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_VERSION:=14.02.00
+PKG_VERSION:=0.0.1406
 PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/sites/default/files/resources/
-PKG_MD5SUM:=d48411a926fa51b082cc1e7cf67c06e8
+PKG_SOURCE_URL:=https://build.allseenalliance.org/ci/view/src/job/source-extraction/lastSuccessfulBuild/artifact/depot/
+PKG_MD5SUM:=
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
@@ -40,7 +25,8 @@ define Package/$(PKG_NAME)
   TITLE:=AllJoyn $(AJ_SERVICE_NAME) service library
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=alljoyn
+  DEPENDS:=alljoyn \
+	+alljoyn-about \
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
   MENU:=1
@@ -55,7 +41,6 @@ define Package/$(PKG_NAME)-samples
 $(call Package/$(PKG_NAME))
   TITLE+=- testing samples
   DEPENDS:=$(PKG_NAME) \
-	+alljoyn-about \
 	+alljoyn-services_common
   MENU:=0
 endef
@@ -74,7 +59,7 @@ else
 endif
 
 
-PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/services/$(AJ_SERVICE)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist/$(AJ_SERVICE)
+PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist/$(AJ_SERVICE)
 
 TARGET_CFLAGS+=-fPIC
 TARGET_CPPFLAGS+=-fPIC
@@ -90,7 +75,7 @@ define Build/Configure/Default
 endef
 
 define Build/Compile
-	scons -C $(PKG_BUILD_DIR)/services/$(AJ_SERVICE) \
+	scons -C $(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE) \
 		$(PKG_JOBS) \
 		WS=off \
 		CPU=openwrt \
@@ -98,7 +83,7 @@ define Build/Compile
 		"BINDINGS=$(ALLJOYN_BINDINGS)" \
 		"BUILD_SERVICES_SAMPLES=$(ALLJOYN_BUILD_SERVICES_SAMPLES)" \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)" \
-		BD=off \
+		BR=off \
 		BT=off \
 		ICE=off \
 		"TARGET_CC=$$(TARGET_CC)" \

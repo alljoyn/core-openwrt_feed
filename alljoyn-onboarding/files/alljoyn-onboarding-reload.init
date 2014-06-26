@@ -19,11 +19,20 @@ START=58
 
 RADIO_24G=
 find_2_4_radio() {
-	local cfg=$1
+    local cfg=$1
 
-	local hwmode
-	config_get hwmode "$cfg" hwmode
-	[ "$hwmode" = "11ng" ] && RADIO_24G=$cfg
+    #list of known wireless protocols
+    local validModes="11b 11g 11a 11ng 11na"
+
+    # get the current hwmode
+    local hwmode
+    config_get hwmode "$cfg" hwmode
+
+    # verify that the hwmode is one of the valid modes
+    local hasMode=`echo "$validModes" | grep $hwmode`
+    if [ -n "$hasMode" ]; then
+        RADIO_24G=$cfg
+    fi
 }
 
 APVAP_24G=
@@ -46,7 +55,7 @@ start() {
 	state=$(uci_get alljoyn-onboarding @onboarding[0] state)
 	[ "${state}" = "3" ] && return 0
 
-	local macaddr=$(ifconfig | awk '/HWaddr/ { print $5; exit;}')
+	local macaddr="$(cat /sys/class/ieee80211/phy0/macaddress)"
 	# save the ssid in case it gets overwritten and we need it again
 	uci_set alljoyn-onboarding @onboarding[0] apssid "AJ_OpenWRT ${macaddr}"
 	uci_commit alljoyn-onboarding

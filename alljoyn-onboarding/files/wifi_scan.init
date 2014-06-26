@@ -17,6 +17,10 @@
 
 START=61
 
-start() {
-	/usr/sbin/wifi_scan
+boot() {
+# Schedule the script to refresh the results with a cron job
+    /etc/init.d/cron stop
+    sed -i '/\/usr\/sbin\/wifi_scan/d' /etc/crontabs/root
+    echo '*/15 * * * * /usr/sbin/wifi_scan' >> /etc/crontabs/root
+    /etc/init.d/cron start
 }

@@ -1,75 +1,44 @@
-# Copyright (c) 2013-2014, AllSeen Alliance. All rights reserved.
-#
-#    Permission to use, copy, modify, and/or distribute this software for any
-#    purpose with or without fee is hereby granted, provided that the above
-#    copyright notice and this permission notice appear in all copies.
-#
-#    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-#    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-#    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-#    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-#    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-#    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-#    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-
 AJ_SERVICE:=onboarding
 AJ_SERVICE_NAME:=onboarding
-JSON_LIB:=json-c
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_VERSION:=14.02.00
+PKG_VERSION:=0.0.1406
 PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/sites/default/files/resources/
-PKG_MD5SUM:=d76e10ab1dc2b7a7a53c734ba4faaa1e
+PKG_SOURCE_URL:=https://build.allseenalliance.org/ci/view/src/job/source-extraction/lastSuccessfulBuild/artifact/depot/
+PKG_MD5SUM:=
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
 
-PKG_CONFIG_DEPENDS:= CONFIG_PACKAGE_$(PKG_NAME)-samples
 
 include $(INCLUDE_DIR)/package.mk
 
 ALLJOYN_BINDINGS:=cpp,
-ALLJOYN_BUILD_SERVICES_SAMPLES:=off
 
+# Due to inherited dependencies (onboarding package depends on wpa-cli package and therefore inherits its dependencies)
+# the onboarding package will not be visible for selection unless the wpa-supplicant package is first selected
 define Package/$(PKG_NAME)
   TITLE:=AllJoyn $(AJ_SERVICE_NAME) service library
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=alljoyn
-  URL:=http://www.allseenalliance.org
-  MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
-  MENU:=1
-endef
-
-define Package/$(PKG_NAME)/description
-AllJoyn $(AJ_SERVICE_NAME) service library.
-endef
-
-
-define Package/$(PKG_NAME)-samples
-$(call Package/$(PKG_NAME))
-  TITLE+=- testing samples
-  DEPENDS:=$(PKG_NAME) \
+  DEPENDS:=alljoyn \
+	wpa-supplicant \
 	+alljoyn-about \
 	+alljoyn-config \
 	+alljoyn-services_common \
-	+lib$(JSON_LIB) \
-	+luci-lib-json
-  MENU:=0
+	+hostapd \
+	+wpa-cli
+  URL:=http://www.allseenalliance.org
+  MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
 
-define Package/$(PKG_NAME)-samples/description
-Alljoyn $(AJ_SERVICE_NAME) service library samples.  (This is primarily for testing.
-The contents of this package vary according which other alljoyn packages
-are selected.)
+define Package/$(PKG_NAME)/description
+AllJoyn $(AJ_SERVICE_NAME) service.
 endef
-
 
 ifeq ($(CONFIG_DEBUG),y)
   ALLJOYN_BUILD_VARIANT:=debug
@@ -78,32 +47,26 @@ else
 endif
 
 
-PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/services/$(AJ_SERVICE)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist/$(AJ_SERVICE)
+PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist/$(AJ_SERVICE)
 
 TARGET_CFLAGS+=-fPIC
 TARGET_CPPFLAGS+=-fPIC
-
-ifdef CONFIG_PACKAGE_$(PKG_NAME)-samples
-  ifdef CONFIG_PACKAGE_alljoyn-about
-    ALLJOYN_BUILD_SERVICES_SAMPLES:=on
-  endif
-endif
+TARGET_LDFLAGS+=-lpthread -lrt
 
 define Build/Configure/Default
 # Override default to do nothing
 endef
 
 define Build/Compile
-	scons -C $(PKG_BUILD_DIR)/services/$(AJ_SERVICE) \
+	scons -C $(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE) \
 		$(PKG_JOBS) \
 		WS=off \
 		CPU=openwrt \
 		OS=openwrt \
 		"BINDINGS=$(ALLJOYN_BINDINGS)" \
-		"BUILD_SERVICES_SAMPLES=$(ALLJOYN_BUILD_SERVICES_SAMPLES)" \
-		"JSON_LIB=$(JSON_LIB)" \
+		"BUILD_SERVICES_SAMPLES=off" \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)" \
-		BD=off \
+		BR=off \
 		BT=off \
 		ICE=off \
 		"TARGET_CC=$$(TARGET_CC)" \
@@ -130,12 +93,9 @@ endef
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/lib/liballjoyn_$(AJ_SERVICE).so $(1)/usr/lib/
-endef
 
-
-define Package/$(PKG_NAME)-samples/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/* $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/onboarding-daemon $(1)/usr/bin/
 
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -148,13 +108,15 @@ define Package/$(PKG_NAME)-samples/install
 	$(INSTALL_CONF) ./files/alljoyn-onboarding.config $(1)/etc/config/alljoyn-onboarding
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/wifi_scan $(1)/usr/sbin/wifi_scan
+	$(INSTALL_BIN) ./files/parse_wifi_scan.awk $(1)/usr/sbin/parse_wifi_scan.awk
 	$(INSTALL_BIN) ./files/wifi_mgmt $(1)/usr/sbin/wifi_mgmt
 	$(INSTALL_DIR) $(1)/etc/alljoyn-onboarding
-	$(CP) $(PKG_BUILD_DIR)/services/onboarding/cpp/samples/OnboardingServiceSample/OnboardingService.conf $(1)/etc/alljoyn-onboarding/
-	$(CP) $(PKG_BUILD_DIR)/services/onboarding/cpp/samples/OnboardingServiceSample/FactoryOnboardingService.conf $(1)/etc/alljoyn-onboarding/
+	$(INSTALL_CONF) ./files/alljoyn-onboarding.state $(1)/etc/alljoyn-onboarding/alljoyn-onboarding-state
+	$(CP) $(PKG_BUILD_DIR)/services/base/onboarding/cpp/src/OnboardingDaemon/OnboardingService.conf $(1)/etc/alljoyn-onboarding/
+	$(CP) $(PKG_BUILD_DIR)/services/base/onboarding/cpp/src/OnboardingDaemon/FactoryOnboardingService.conf $(1)/etc/alljoyn-onboarding/
 endef
 
-define Package/$(PKG_NAME)-samples/postinst
+define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 if [ -z "$${IPKG_INSTROOT}" ]; then
     . /etc/uci-defaults/alljoyn-onboarding
@@ -163,13 +125,18 @@ fi
 exit 0
 endef
 
-define Package/$(PKG_NAME)-samples/prerm
+define Package/$(PKG_NAME)/prerm
 #!/bin/sh
 if [ -z "$${IPKG_INSTROOT}" ]; then
     /etc/init.d/alljoyn-onboarding stop
     /etc/init.d/alljoyn-onboarding disable
     /etc/init.d/wifi_scan disable
     /etc/init.d/alljoyn-onboarding-reload disable
+    crontab -l 2>/dev/null | sed '/\/etc\/init.d\/alljoyn-onboarding/d' | crontab -
+    crontab -l 2>/dev/null | sed '/\/usr\/sbin\/wifi_scan/d' | crontab -
+    local obswifiIndex=$(uci show /etc/config/firewall | grep obswifi | grep name | cut -d"[" -f2 | cut -c1)
+    uci delete firewall.@zone[$(obswifiIndex)]
+    uci commit firewall
     uci batch <<EOF
 del_list ucitrack.@alljoyn[-1].affects=alljoyn-onboarding
 delete ucitrack.@alljoyn-onboarding[-1]
@@ -180,5 +147,5 @@ exit 0
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
-$(eval $(call BuildPackage,$(PKG_NAME)-samples))
+
 
