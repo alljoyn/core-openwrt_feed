@@ -1,11 +1,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
-PKG_VERSION:=0.0.1406
+PKG_VERSION:=14.06.00_beta
 PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://build.allseenalliance.org/ci/view/src/job/source-extraction/lastSuccessfulBuild/artifact/depot/
+PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/14.06.00_beta/
 PKG_MD5SUM:=
 
 
