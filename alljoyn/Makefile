@@ -209,7 +209,6 @@ define Package/alljoyn-samples/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/advtunnel $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/aes_ccm $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/autochat $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bastress $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bastress2 $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbclient $(1)/usr/bin/
