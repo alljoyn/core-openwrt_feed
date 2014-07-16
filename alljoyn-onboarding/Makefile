@@ -108,7 +108,8 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_CONF) ./files/alljoyn-onboarding.config $(1)/etc/config/alljoyn-onboarding
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/wifi_scan $(1)/usr/sbin/wifi_scan
-	$(INSTALL_BIN) ./files/parse_wifi_scan.awk $(1)/usr/sbin/parse_wifi_scan.awk
+	$(INSTALL_BIN) ./files/parse_iw_wifi_scan $(1)/usr/sbin/parse_iw_wifi_scan
+	$(INSTALL_BIN) ./files/parse_iwlist_wifi_scan $(1)/usr/sbin/parse_iwlist_wifi_scan
 	$(INSTALL_BIN) ./files/wifi_mgmt $(1)/usr/sbin/wifi_mgmt
 	$(INSTALL_DIR) $(1)/etc/alljoyn-onboarding
 	$(INSTALL_CONF) ./files/alljoyn-onboarding.state $(1)/etc/alljoyn-onboarding/alljoyn-onboarding-state

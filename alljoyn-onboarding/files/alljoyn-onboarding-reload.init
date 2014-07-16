@@ -55,7 +55,9 @@ start() {
 	state=$(uci_get alljoyn-onboarding @onboarding[0] state)
 	[ "${state}" = "3" ] && return 0
 
-	local macaddr="$(cat /sys/class/ieee80211/phy0/macaddress)"
+	local iface=$(cat /proc/net/wireless | grep -m 1 : | sed -e 's/:.*//' | sed -e 's/ //g')
+	local macaddr=$(cat /sys/class/net/$iface/address)
+
 	# save the ssid in case it gets overwritten and we need it again
 	uci_set alljoyn-onboarding @onboarding[0] apssid "AJ_OpenWRT ${macaddr}"
 	uci_commit alljoyn-onboarding

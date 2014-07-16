@@ -105,13 +105,27 @@ wifi_configure_commit() {
 }
 
 wifi_connect_status() {
-    iface=`iw dev | grep Interface | cut -f 2 -s -d" "`
+    ifstatus=$(ifstatus obswifi)
+    json_load "$ifstatus"
+    json_get_var iface device
     local timeout=4
     local result=$ERROR_UNREACHABLE
     local conn_state=0
+
+    if [ -z $iface ]; then
+        echo "Device not defined for obswifi" >&2
+        set_error $ERROR_UNREACHABLE "Unreachable"
+        return $result
+    fi
+
     while [ ${timeout} -gt 0 ]; do
         sleep 1
-        conn_state=$(wpa_cli -i ${iface} status 2>/dev/null | grep wpa_state | cut -d= -f2)
+        ctrl_iface=$(grep ctrl_interface /var/run/wpa_supplicant-${iface}.conf | sed s/ctrl_interface=//)
+        if [ -z "${ctrl_iface}" ]; then
+            conn_state=$(wpa_cli -i ${iface} status 2>/dev/null | grep wpa_state | cut -d= -f2)
+        else
+            conn_state=$(wpa_cli -i ${iface} -p ${ctrl_iface} status 2>/dev/null | grep wpa_state | cut -d= -f2)
+        fi
         echo ${conn_state} >&2
         if [ "${conn_state}" = "COMPLETED" ]; then
             result=$ERROR_NONE
@@ -215,9 +229,23 @@ check_params() {
                     return 1
             fi
 
-            if [ $(expr length "${psk}") -gt 63 ]; then
-            echo "In WPA, please specify a passphrase of size less than 64" >&2
-                    return 1
+            if [ $(expr length "${psk}") -eq 64 ]; then
+                local i=0
+                while [ $i -lt 64 ]; do
+                    char=${psk:$i:1}
+                    case "$char" in
+
+                    [a-fA-F0-9] );;
+
+                    * )
+                        echo "In WPA, please specify an ASCII passphrase of size less than 64 or a Hex passphrase of size 64" >&2
+                        return 1;;
+                    esac
+                i=$((i+1))
+                done
+            elif [ $(expr length "${psk}") -gt 64 ]; then
+                echo "In WPA, please specify an ASCII passphrase of size less than 64 or a Hex passphrase of size 64" >&2
+                return 1
             fi
         ;;
         *)

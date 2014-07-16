@@ -15,13 +15,20 @@
 
 findPid=$(pgrep /usr/sbin/wifi_scan)
 
-if [ -z $findPid ]
-then
-    device=`iw dev | grep Interface | cut -f 2 -s -d" "`
+if [ -z $findPid ]; then
 
-    # Sometimes right after boot, the device is not ready yet
-    if [ -n $device ]
-    then
-        iw $device scan | awk -f /usr/sbin/parse_wifi_scan.awk | sort -n -r | awk '{sep="";for (i=4;i<=NF;i++) {printf "%s%s",sep, $i;sep=" "}; printf "\t"$3"\n"}' | sort | uniq > /tmp/wifi_scan_results
+    ## Get the scan results based on method available
+    hasIw=$(which iw)
+    hasIwList=$(which iwlist)
+
+    if [ -n "$hasIw" ]; then
+        result=$(/usr/sbin/parse_iw_wifi_scan)
+    elif [ -n "$hasIwList" ]; then
+        result=$(/usr/sbin/parse_iwlist_wifi_scan)
+    fi
+
+    ## Sort the results based on signal strength and print it to the file
+    if [ -n "$result" ]; then
+        printf "$result" | sort -n -r | awk '{sep="";for (i=4;i<=NF;i++) {printf "%s%s",sep, $i;sep=" "}; printf "\t"$3"\n"}' | sort | uniq > /tmp/wifi_scan_results
     fi
 fi
