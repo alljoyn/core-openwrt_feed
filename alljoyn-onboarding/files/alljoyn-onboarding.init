@@ -122,8 +122,8 @@ connect() {
 }
 
 offboard() {
-    softap
     set_state $STATE_NOTCONFIGURED
+    softap
     uci delete alljoyn-onboarding.@onboarding[0].ssid
     uci delete alljoyn-onboarding.@onboarding[0].encryption
     uci delete alljoyn-onboarding.@onboarding[0].key
