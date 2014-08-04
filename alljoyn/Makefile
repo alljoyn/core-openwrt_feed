@@ -230,6 +230,7 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
 $(call SamplesInstall,about,$(1))
 endef
 
