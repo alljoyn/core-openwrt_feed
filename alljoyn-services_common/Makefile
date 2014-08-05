@@ -6,10 +6,10 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
 PKG_VERSION:=14.06.00_beta
 PKG_RELEASE:=1
+PKG_MD5SUM:=
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/14.06.00_beta/
-PKG_MD5SUM:=
+PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)

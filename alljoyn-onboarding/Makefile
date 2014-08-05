@@ -6,10 +6,10 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
 PKG_VERSION:=14.06.00_beta
 PKG_RELEASE:=1
+PKG_MD5SUM:=
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/14.06.00_beta/
-PKG_MD5SUM:=
+PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
@@ -108,7 +108,8 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_CONF) ./files/alljoyn-onboarding.config $(1)/etc/config/alljoyn-onboarding
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/wifi_scan $(1)/usr/sbin/wifi_scan
-	$(INSTALL_BIN) ./files/parse_wifi_scan.awk $(1)/usr/sbin/parse_wifi_scan.awk
+	$(INSTALL_BIN) ./files/parse_iw_wifi_scan $(1)/usr/sbin/parse_iw_wifi_scan
+	$(INSTALL_BIN) ./files/parse_iwlist_wifi_scan $(1)/usr/sbin/parse_iwlist_wifi_scan
 	$(INSTALL_BIN) ./files/wifi_mgmt $(1)/usr/sbin/wifi_mgmt
 	$(INSTALL_DIR) $(1)/etc/alljoyn-onboarding
 	$(INSTALL_CONF) ./files/alljoyn-onboarding.state $(1)/etc/alljoyn-onboarding/alljoyn-onboarding-state
