@@ -144,24 +144,26 @@ generate_conf_file() {
     include /lib/network
 
     config_load alljoyn
+    if ! check ip all_networks; then
 
-    config_get ifc ip networks_ITEM1
-    while [ -z "$ifc_up" -a $timeout -gt 0 ]; do
-        scan_interfaces
-        config_get ifc_up "${ifc}" up
-        if [ -z "$ifc_up" ]; then
-            sleep 2
-            timeout=$((--timeout))
+        config_get ifc ip networks_ITEM1
+        while [ -z "$ifc_up" -a $timeout -gt 0 ]; do
+            scan_interfaces
+            config_get ifc_up "${ifc}" up
+            if [ -z "$ifc_up" ]; then
+                sleep 2
+                timeout=$((--timeout))
+            fi
+        done
+
+        if [ $timeout -eq 0 ]; then
+            echo "Timeout waiting for the $ifc interface to come up.  alljoyn-daemon not started"
+            return
         fi
-    done
 
-    if [ $timeout -eq 0 ]; then
-        echo "Timeout waiting for the $ifc interface to come up.  alljoyn-daemon not started"
-        return
+        # Need to reload the alljoyn config since scan_interfaces clears ip_networks
+        config_load alljoyn
     fi
-
-    # Need to reload the alljoyn config since scan_interfaces clears ip_networks
-    config_load alljoyn
 
     process_unix_transport
     process_ip_transport
