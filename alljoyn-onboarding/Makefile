@@ -4,9 +4,9 @@ AJ_SERVICE_NAME:=onboarding
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_VERSION:=14.06.00_beta
+PKG_VERSION:=14.06.00
 PKG_RELEASE:=1
-PKG_MD5SUM:=
+PKG_MD5SUM:=74e473bc4ff992bcd8a63bf23ae8c0aa
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
 PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
