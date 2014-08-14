@@ -1,7 +1,7 @@
 From 54a5abb065459350f6b84e9d62f79fb9e2f99594 Mon Sep 17 00:00:00 2001
 From: Sheshambika Venkateshwaran <sheshamb@qce.qualcomm.com>
 Date: Mon, 4 Aug 2014 14:32:45 -0700
-Subject: [PATCH 1/2] ASACORE-788 Fix memory leak due to m_mdnsPacketTracker.
+Subject: [PATCH 1/4] ASACORE-788 Fix memory leak due to m_mdnsPacketTracker.
 
 Change-Id: I1672f5cc2f91bc553f215a95cc5b5474bf81391a
 Signed-off-by: Sheshambika Venkateshwaran <sheshamb@qce.qualcomm.com>

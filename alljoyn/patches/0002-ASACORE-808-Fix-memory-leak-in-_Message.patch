@@ -1,7 +1,7 @@
 From a2bcdc9bb64bbb9bbaf77d787171846d327ef9b9 Mon Sep 17 00:00:00 2001
 From: Sheshambika Venkateshwaran <sheshamb@qce.qualcomm.com>
 Date: Mon, 11 Aug 2014 16:45:08 -0700
-Subject: [PATCH 2/2] ASACORE-808 Fix memory leak in _Message.
+Subject: [PATCH 2/4] ASACORE-808 Fix memory leak in _Message.
 
 The leak that occurs when MsgArg elements are moved to a larger container.
 
