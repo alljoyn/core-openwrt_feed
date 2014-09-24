@@ -146,15 +146,6 @@ define Build/Compile
 		"STAGING_DIR=$$(STAGING_DIR)"
 endef
 
-define AJServiceInstallDev
-  ifdef CONFIG_PACKAGE_alljoyn-$(1)
-	$$(INSTALL_DIR) $(2)/usr/include/alljoyn/$(1)
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/inc/alljoyn/$(1)/*.h $(2)/usr/include/alljoyn/$(1)
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/lib/liballjoyn_$(1).a $(2)/usr/lib/
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/lib/liballjoyn_$(1).so $(2)/usr/lib/
-  endif
-endef
-
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
 	$(INSTALL_DIR) $(1)/usr/include/alljoyn
@@ -166,13 +157,18 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn.a $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn.so $(1)/usr/lib/
+ifdef CONFIG_PACKAGE_alljoyn-about
+	$(INSTALL_DIR) $(1)/usr/include/alljoyn/about
+	$(CP) $(PKG_INSTALL_DIR)/cpp/inc/alljoyn/about/*.h $(1)/usr/include/alljoyn/about
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.a $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
+endif
 ifdef CONFIG_PACKAGE_alljoyn-c
 	$(INSTALL_DIR) $(1)/usr/include/alljoyn_c
 	$(CP) $(PKG_INSTALL_DIR)/c/inc/alljoyn_c/*.h $(1)/usr/include/alljoyn_c/
 	$(CP) $(PKG_INSTALL_DIR)/c/lib/liballjoyn_c.a $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/c/lib/liballjoyn_c.so $(1)/usr/lib/
 endif
-$(call AJServiceInstallDev,about,$(1))
 endef
 
 define Package/alljoyn/conffiles
@@ -192,17 +188,14 @@ define Package/alljoyn/install
 	$(INSTALL_CONF) ./files/alljoyn.config $(1)/etc/config/alljoyn
 endef
 
+define Package/alljoyn-about/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
+endef
+
 define Package/alljoyn-c/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/c/lib/liballjoyn_c.so $(1)/usr/lib/
-endef
-
-
-
-define SamplesInstall
-ifdef CONFIG_PACKAGE_alljoyn-$(1)
-	$$(INSTALL_BIN) $$(PKG_INSTALL_DIR)/$(1)/bin/* $(2)/usr/bin/
-endif
 endef
 
 define Package/alljoyn-samples/install
@@ -230,7 +223,10 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
-$(call SamplesInstall,about,$(1))
+ifdef CONFIG_PACKAGE_alljoyn-about
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/AboutClient $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/AboutService $(1)/usr/bin/
+endif
 endef
 
 define Package/alljoyn/postinst
