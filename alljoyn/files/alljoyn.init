@@ -108,6 +108,13 @@ process_slap_transport() {
 
 
 process_switch_user() {
+    local user
+
+    config_get user daemon user "root"
+
+    if [ "$user" != "root" ]; then
+        export ${NO_EXPORT:+-n} switch_user="<user>${user}</user>"
+    fi
 }
 
 generate_conf_file() {
