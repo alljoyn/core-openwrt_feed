@@ -26,7 +26,7 @@ define Package/$(PKG_NAME)
   SECTION:=net
   CATEGORY:=Network
   DEPENDS:=alljoyn \
-	+alljoyn-about \
+	+alljoyn-about
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
   MENU:=1
