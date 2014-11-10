@@ -40,9 +40,23 @@ daemon and C++ library.
 endef
 
 
+define Package/alljoyn-non-gw-config
+$(call Package/alljoyn/Default)
+  TITLE:=AllJoyn - alternate non-Gateway Config
+  DEPENDS:=alljoyn
+endef
+
+define Package/alljoyn-non-gw-config/description
+Alternate AllJoyn configuration with defaults suitable for
+non-Gateway devices.  Do not install this on devices with a
+network interface connected to an insecure network such as
+the Internet.
+endef
+
+
 define Package/alljoyn-c
 $(call Package/alljoyn/Default)
-  TITLE:=AllJoyn Peer-to-Peer networking - C binding
+  TITLE:=AllJoyn - C binding
   DEPENDS:=alljoyn
 endef
 
@@ -88,7 +102,7 @@ $(eval $(call AJServicePackage,about,About,))
 
 define Package/alljoyn-samples
 $(call Package/alljoyn/Default)
-  TITLE:=AllJoyn Peer-to-Peer networking - testing samples
+  TITLE:=AllJoyn - testing samples
   DEPENDS:=alljoyn \
 	+PACKAGE_alljoyn-about:alljoyn-about
 endef
@@ -175,6 +189,10 @@ define Package/alljoyn/conffiles
 /etc/config/alljoyn
 endef
 
+define Package/alljoyn-non-gw-config/conffiles
+/etc/config/alljoyn
+endef
+
 define Package/alljoyn/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/alljoyn-daemon $(1)/usr/bin
@@ -186,6 +204,11 @@ define Package/alljoyn/install
 	$(INSTALL_BIN) ./files/alljoyn.defaults $(1)/etc/uci-defaults/alljoyn
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/alljoyn.config $(1)/etc/config/alljoyn
+endef
+
+define Package/alljoyn-non-gw-config/install
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) ./files/alljoyn-non-gw.config $(1)/etc/config/alljoyn
 endef
 
 define Package/alljoyn-about/install
@@ -255,6 +278,7 @@ endef
 
 
 $(eval $(call BuildPackage,alljoyn))
+$(eval $(call BuildPackage,alljoyn-non-gw-config))
 $(eval $(call BuildPackage,alljoyn-c))
 $(eval $(call BuildPackage,alljoyn-about))
 $(eval $(call BuildPackage,alljoyn-samples))
