@@ -186,6 +186,7 @@ endif
 endef
 
 define Package/alljoyn/conffiles
+/etc/alljoyn/alljoyn.conf
 /etc/config/alljoyn
 endef
 
@@ -204,6 +205,8 @@ define Package/alljoyn/install
 	$(INSTALL_BIN) ./files/alljoyn.defaults $(1)/etc/uci-defaults/alljoyn
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/alljoyn.config $(1)/etc/config/alljoyn
+	$(INSTALL_DIR) $(1)/etc/alljoyn
+	$(INSTALL_CONF) ./files/alljoyn.conf $(1)/etc/alljoyn/alljoyn.conf
 endef
 
 define Package/alljoyn-non-gw-config/install
