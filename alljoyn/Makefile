@@ -277,6 +277,26 @@ exit 0
 endef
 
 
+define Package/alljoyn-non-gw-config/preinst
+#!/bin/sh
+if [ -z "$${IPKG_INSTROOT}" ]; then
+    echo 'Saving original alljoyn config file to alljoyn-orig'
+    mv /etc/config/alljoyn /etc/config/alljoyn-orig
+fi
+exit 0
+endef
+
+define Package/alljoyn-non-gw-config/postrm
+#!/bin/sh
+if [ -z "$${IPKG_INSTROOT}" ]; then
+    if [ -e /etc/config/alljoyn-orig ]; then
+        echo 'Restoring original alljoyn config file from alljoyn-orig'
+        mv /etc/config/alljoyn-orig /etc/config/alljoyn
+    fi
+fi
+exit 0
+endef
+
 $(eval $(call BuildPackage,alljoyn))
 $(eval $(call BuildPackage,alljoyn-non-gw-config))
 $(eval $(call BuildPackage,alljoyn-c))
