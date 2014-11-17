@@ -19,7 +19,8 @@ START=65
 
 SERVICE_PID_FILE=/var/run/alljoyn.pid
 
-CONFIGFILE="/var/etc/alljoyn.conf"
+CONFIGFILE="/etc/alljoyn/alljoyn.conf"
+GENCONFIGFILE="/var/etc/alljoyn.conf"
 
 
 check() {
@@ -76,7 +77,7 @@ process_ip_transport() {
 
         if check ip all_networks; then
             export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
-  <listen>tcp:iface=${iface},port=${port}</listen>"
+  <listen>tcp:iface=*,port=${port}</listen>"
         else
             config_load network
             config_load alljoyn  # loading the network config clobbers the alljoyn config vars
@@ -125,14 +126,9 @@ generate_conf_file() {
     local ip_auth_timeout=20000
     local ip_networks=""
     local ip_advertise_daemon=""
-
-    local ifc_up=""
-    local ifc=""
-    local timeout=15
-
     local switch_user=""
 
-    rm -f $CONFIGFILE
+    rm -f $GENCONFIGFILE
 
     include /lib/network
 
@@ -143,13 +139,10 @@ generate_conf_file() {
     process_slap_transport
     process_switch_user
 
-    mkdir -p $(dirname $CONFIGFILE)
+    mkdir -p $(dirname $GENCONFIGFILE)
 
-    cat > $CONFIGFILE <<EOF
+    cat > $GENCONFIGFILE <<EOF
 <busconfig>
-  <type>alljoyn</type>
-  <fork/>
-  <syslog/>
   <pidfile>${SERVICE_PID_FILE}</pidfile>
   ${switch_user}
   ${listen_specs}
@@ -158,7 +151,6 @@ generate_conf_file() {
   <limit name="max_incomplete_connections">${ip_max_incomplete_conn}</limit>
   <limit name="max_completed_connections">${ip_max_complete_conn}</limit>
   <limit name="max_untrusted_clients">${ip_max_complete_conn}</limit>
-  <flag name="restrict_untrusted_clients">false</flag>
 </busconfig>
 EOF
 }
