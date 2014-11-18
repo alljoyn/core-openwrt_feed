@@ -67,38 +67,17 @@ to the C++ library.
 endef
 
 
-ALLJOYN_BINDINGS:=cpp,
-ALLJOYN_SERVICES:=
-ALLJOYN_BUILD_SERVICES_SAMPLES:=off
-
-ifdef CONFIG_PACKAGE_alljoyn-c
-  ALLJOYN_BINDINGS+=c,
-endif
-
-define AJServicePackage
-  ifdef CONFIG_PACKAGE_alljoyn-$(1)
-    ALLJOYN_SERVICES+=$(1),
-  endif
-
-  define Package/alljoyn-$(1)
-  $(call Package/alljoyn/Default)
-    TITLE:=AllJoyn - $(2) service library
-    DEPENDS:=alljoyn $(3)
-  endef
-
-  define Package/alljoyn-$(1)/description
-AllJoyn $(2) service library.
-  endef
-
-  define Package/alljoyn-$(1)/install
-	$$(INSTALL_DIR) $$(1)/usr/lib
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/lib/liballjoyn_$(1).so $$(1)/usr/lib/
-  endef
+define Package/alljoyn-about
+$(call Package/alljoyn/Default)
+  TITLE:=AllJoyn - About service library (deprecated)
+  DEPENDS:=alljoyn
 endef
 
-
-$(eval $(call AJServicePackage,about,About,))
-
+define Package/alljoyn-about/description
+AllJoyn About services library.  This library is deprecated.  The functionality
+provided by About has been integrated into liballjoyn with a simpler API.  This
+library will continue to be supported into 2015 and will be removed in 2016.
+endef
 
 define Package/alljoyn-samples
 $(call Package/alljoyn/Default)
@@ -111,6 +90,18 @@ define Package/alljoyn-samples/description
 Alljoyn samples.  (This is primarily for testing.  The contents of this
 package vary according which other alljoyn packages are selected.)
 endef
+
+ALLJOYN_BINDINGS:=cpp,
+ALLJOYN_SERVICES:=
+ALLJOYN_BUILD_SERVICES_SAMPLES:=off
+
+ifdef CONFIG_PACKAGE_alljoyn-c
+  ALLJOYN_BINDINGS+=c,
+endif
+
+ifdef CONFIG_PACKAGE_alljoyn-about
+  ALLJOYN_SERVICES+=about,
+endif
 
 
 ifeq ($(CONFIG_DEBUG),y)
@@ -125,13 +116,7 @@ PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)
 TARGET_CFLAGS+=-fPIC
 TARGET_CPPFLAGS+=-fPIC
 
-ifdef CONFIG_PACKAGE_alljoyn-samples
-  ifdef CONFIG_PACKAGE_alljoyn-about
-    ALLJOYN_BUILD_SERVICES_SAMPLES:=on
-  endif
-endif
-
-define Build/Configure/Default
+define Build/Configure
 # Override default to do nothing
 endef
 
@@ -214,14 +199,14 @@ define Package/alljoyn-non-gw-config/install
 	$(INSTALL_CONF) ./files/alljoyn-non-gw.config $(1)/etc/config/alljoyn
 endef
 
-define Package/alljoyn-about/install
-	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
-endef
-
 define Package/alljoyn-c/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/c/lib/liballjoyn_c.so $(1)/usr/lib/
+endef
+
+define Package/alljoyn-about/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
 endef
 
 define Package/alljoyn-samples/install
@@ -249,10 +234,8 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
 ifdef CONFIG_PACKAGE_alljoyn-about
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/AboutClient $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/AboutService $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
 endif
 endef
 
