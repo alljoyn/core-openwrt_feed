@@ -1,6 +1,6 @@
 #!/bin/sh /etc/rc.common
 
-# Copyright (c) 2013, AllSeen Alliance. All rights reserved.
+# Copyright (c) 2013-2014, AllSeen Alliance. All rights reserved.
 #
 #    Permission to use, copy, modify, and/or distribute this software for any
 #    purpose with or without fee is hereby granted, provided that the above
@@ -19,7 +19,8 @@ START=65
 
 SERVICE_PID_FILE=/var/run/alljoyn.pid
 
-CONFIGFILE="/var/etc/alljoyn.conf"
+CONFIGFILE="/etc/alljoyn/alljoyn.conf"
+GENCONFIGFILE="/var/etc/alljoyn.conf"
 
 
 check() {
@@ -32,99 +33,90 @@ check() {
 }
 
 
-process_network() {
-    local network="$1"
-    local var="$2"
-    local ifname
-
-    config_get ifname "$network" ifname
-    if [ -n "$ifname" ]; then
-	append "${var}" "${ifname}" ","
-    fi
-}
-
-process_networks() {
-    local section="$1"
-
-    if check "$section" all_networks; then
-	export "${section}_networks=*"
-    else
-	config_list_foreach "$section" networks process_network "${section}_networks"
-
-	if [ "$section" == "ip" ]; then
-	    # special case IP until multiple interfaces are properly supported for IP
-	    local len
-	    config_get len ip networks_LENGTH
-
-	    if [ "$len" == "1" ]; then
-		local network
-		config_get network ip networks_ITEM1
-		config_get addr "$network" ipaddr
-	    fi
-	fi
-    fi
-}
-
-
 process_unix_transport() {
     if check unix enable; then
-	local path
-	local abstract
+        local path
+        local abstract
 
 
-	config_get path unix path "alljoyn"
-	config_get_bool abstract unix abstract "1"
+        config_get path unix path "alljoyn"
+        config_get_bool abstract unix abstract "1"
 
-	if [ -n "$abstract" ]; then
-	    path="abstract=$path"
-	else
-	    path="path=$path"
-	fi
-	export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+        if [ -n "$abstract" ]; then
+            path="abstract=$path"
+        else
+            path="path=$path"
+        fi
+        export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
   <listen>unix:${path}</listen>"
     fi
 }
 
 
+process_ip_network() {
+    local network="$1"
+    local port="$2"
+    local ifname
+
+    config_get ifname "$network" ifname
+    if [ -n "$ifname" ]; then
+        export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+  <listen>tcp:iface=${ifname},port=${port}</listen>"
+    fi
+}
+
 process_ip_transport() {
     if check ip enable; then
-	local port
-	local addr="0.0.0.0"
+        local port
 
-	if check ip advertise_daemon; then
-	    export ${NO_EXPORT:+-n} ip_advertise_daemon="<property name=\"router_advertisement_prefix\">org.alljoyn.BusNode.</property>"
-	fi
+        if check ip advertise_daemon; then
+            export ${NO_EXPORT:+-n} ip_advertise_daemon="<property name=\"router_advertisement_prefix\">org.alljoyn.BusNode.</property>"
+        fi
 
-	process_networks ip
+        config_get port ip bus_port 9955
 
-	config_get port ip bus_port 9955
+        if check ip all_networks; then
+            export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+  <listen>tcp:iface=*,port=${port}</listen>"
+        else
+            config_load network
+            config_load alljoyn  # loading the network config clobbers the alljoyn config vars
+            config_list_foreach ip networks process_ip_network "${port}"
+        fi
 
-	export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
-  <listen>tcp:addr=${addr},port=${port}</listen>"
-
-	config_get ip_max_incomplete_conn ip max_incomplete_conn "$ip_max_incomplete_conn"
-	config_get ip_max_complete_conn ip max_complete_conn "$ip_max_complete_conn"
-	config_get ip_auth_timeout ip auth_timeout "$ip_auth_timeout"
+        config_get ip_max_incomplete_conn ip max_incomplete_conn "$ip_max_incomplete_conn"
+        config_get ip_max_complete_conn ip max_complete_conn "$ip_max_complete_conn"
+        config_get ip_auth_timeout ip auth_timeout "$ip_auth_timeout"
     fi
 }
 
 
 process_slap_transport() {
     if check slap enable; then
-	local path
-	local baud
+        local path
+        local baud
 
-	config_get path slap path "/dev/ttyUSB0"
-	config_get baud slap baud "115200"
-	config_get databits slap databits "8"
-	config_get parity slap parity "none"
-	config_get stopbits slap stopbits "1"
+        config_get path slap path "/dev/ttyUSB0"
+        config_get baud slap baud "115200"
+        config_get databits slap databits "8"
+        config_get parity slap parity "none"
+        config_get stopbits slap stopbits "1"
 
-	export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
+        export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
   <listen>slap:type=uart;dev=${path};baud=${baud};databits=${databits};parity=${parity};stopbits=${stopbits}</listen>"
     fi
 }
 
+
+process_switch_user() {
+    local user
+
+    config_get user daemon user "root"
+
+    if [ "$user" != "root" ]; then
+        export ${NO_EXPORT:+-n} switch_user="<user>${user}</user>"
+    fi
+}
 
 generate_conf_file() {
     local listen_specs=""
@@ -134,57 +126,31 @@ generate_conf_file() {
     local ip_auth_timeout=20000
     local ip_networks=""
     local ip_advertise_daemon=""
+    local switch_user=""
 
-    local ifc_up=""
-    local ifc=""
-    local timeout=15
-
-    rm -f $CONFIGFILE
+    rm -f $GENCONFIGFILE
 
     include /lib/network
 
     config_load alljoyn
-    if ! check ip all_networks; then
-
-        config_get ifc ip networks_ITEM1
-        while [ -z "$ifc_up" -a $timeout -gt 0 ]; do
-            scan_interfaces
-            config_get ifc_up "${ifc}" up
-            if [ -z "$ifc_up" ]; then
-                sleep 2
-                timeout=$((--timeout))
-            fi
-        done
-
-        if [ $timeout -eq 0 ]; then
-            echo "Timeout waiting for the $ifc interface to come up.  alljoyn-daemon not started"
-            return
-        fi
-
-        # Need to reload the alljoyn config since scan_interfaces clears ip_networks
-        config_load alljoyn
-    fi
 
     process_unix_transport
     process_ip_transport
     process_slap_transport
+    process_switch_user
 
-    mkdir -p $(dirname $CONFIGFILE)
+    mkdir -p $(dirname $GENCONFIGFILE)
 
-    cat > $CONFIGFILE <<EOF
+    cat > $GENCONFIGFILE <<EOF
 <busconfig>
-  <type>alljoyn</type>
-  <fork/>
-  <syslog/>
   <pidfile>${SERVICE_PID_FILE}</pidfile>
+  ${switch_user}
   ${listen_specs}
   ${ip_advertise_daemon}
-  <property name="ns_interfaces">${ip_networks}</property>
   <limit name="auth_timeout">${ip_auth_timeout}</limit>
   <limit name="max_incomplete_connections">${ip_max_incomplete_conn}</limit>
   <limit name="max_completed_connections">${ip_max_complete_conn}</limit>
   <limit name="max_untrusted_clients">${ip_max_complete_conn}</limit>
-  <flag name="restrict_untrusted_clients">false</flag>
 </busconfig>
 EOF
 }

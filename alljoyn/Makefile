@@ -42,9 +42,23 @@ daemon and C++ library.
 endef
 
 
+define Package/alljoyn-non-gw-config
+$(call Package/alljoyn/Default)
+  TITLE:=AllJoyn - alternate non-Gateway Config
+  DEPENDS:=alljoyn
+endef
+
+define Package/alljoyn-non-gw-config/description
+Alternate AllJoyn configuration with defaults suitable for
+non-Gateway devices.  Do not install this on devices with a
+network interface connected to an insecure network such as
+the Internet.
+endef
+
+
 define Package/alljoyn-c
 $(call Package/alljoyn/Default)
-  TITLE:=AllJoyn Peer-to-Peer networking - C binding
+  TITLE:=AllJoyn - C binding
   DEPENDS:=alljoyn
 endef
 
@@ -55,42 +69,21 @@ to the C++ library.
 endef
 
 
-ALLJOYN_BINDINGS:=cpp,
-ALLJOYN_SERVICES:=
-ALLJOYN_BUILD_SERVICES_SAMPLES:=off
-
-ifdef CONFIG_PACKAGE_alljoyn-c
-  ALLJOYN_BINDINGS+=c,
-endif
-
-define AJServicePackage
-  ifdef CONFIG_PACKAGE_alljoyn-$(1)
-    ALLJOYN_SERVICES+=$(1),
-  endif
-
-  define Package/alljoyn-$(1)
-  $(call Package/alljoyn/Default)
-    TITLE:=AllJoyn - $(2) service library
-    DEPENDS:=alljoyn $(3)
-  endef
-
-  define Package/alljoyn-$(1)/description
-AllJoyn $(2) service library.
-  endef
-
-  define Package/alljoyn-$(1)/install
-	$$(INSTALL_DIR) $$(1)/usr/lib
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/lib/liballjoyn_$(1).so $$(1)/usr/lib/
-  endef
+define Package/alljoyn-about
+$(call Package/alljoyn/Default)
+  TITLE:=AllJoyn - About service library (deprecated)
+  DEPENDS:=alljoyn
 endef
 
-
-$(eval $(call AJServicePackage,about,About,))
-
+define Package/alljoyn-about/description
+AllJoyn About services library.  This library is deprecated.  The functionality
+provided by About has been integrated into liballjoyn with a simpler API.  This
+library will continue to be supported into 2015 and will be removed in 2016.
+endef
 
 define Package/alljoyn-samples
 $(call Package/alljoyn/Default)
-  TITLE:=AllJoyn Peer-to-Peer networking - testing samples
+  TITLE:=AllJoyn - testing samples
   DEPENDS:=alljoyn \
 	+PACKAGE_alljoyn-about:alljoyn-about
 endef
@@ -99,6 +92,18 @@ define Package/alljoyn-samples/description
 Alljoyn samples.  (This is primarily for testing.  The contents of this
 package vary according which other alljoyn packages are selected.)
 endef
+
+ALLJOYN_BINDINGS:=cpp,
+ALLJOYN_SERVICES:=
+ALLJOYN_BUILD_SERVICES_SAMPLES:=off
+
+ifdef CONFIG_PACKAGE_alljoyn-c
+  ALLJOYN_BINDINGS+=c,
+endif
+
+ifdef CONFIG_PACKAGE_alljoyn-about
+  ALLJOYN_SERVICES+=about,
+endif
 
 
 ifeq ($(CONFIG_DEBUG),y)
@@ -113,13 +118,7 @@ PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)
 TARGET_CFLAGS+=-fPIC
 TARGET_CPPFLAGS+=-fPIC
 
-ifdef CONFIG_PACKAGE_alljoyn-samples
-  ifdef CONFIG_PACKAGE_alljoyn-about
-    ALLJOYN_BUILD_SERVICES_SAMPLES:=on
-  endif
-endif
-
-define Build/Configure/Default
+define Build/Configure
 # Override default to do nothing
 endef
 
@@ -148,15 +147,6 @@ define Build/Compile
 		"STAGING_DIR=$$(STAGING_DIR)"
 endef
 
-define AJServiceInstallDev
-  ifdef CONFIG_PACKAGE_alljoyn-$(1)
-	$$(INSTALL_DIR) $(2)/usr/include/alljoyn/$(1)
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/inc/alljoyn/$(1)/*.h $(2)/usr/include/alljoyn/$(1)
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/lib/liballjoyn_$(1).a $(2)/usr/lib/
-	$$(CP) $$(PKG_INSTALL_DIR)/$(1)/lib/liballjoyn_$(1).so $(2)/usr/lib/
-  endif
-endef
-
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
 	$(INSTALL_DIR) $(1)/usr/include/alljoyn
@@ -168,16 +158,26 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn.a $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn.so $(1)/usr/lib/
+ifdef CONFIG_PACKAGE_alljoyn-about
+	$(INSTALL_DIR) $(1)/usr/include/alljoyn/about
+	$(CP) $(PKG_INSTALL_DIR)/cpp/inc/alljoyn/about/*.h $(1)/usr/include/alljoyn/about
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.a $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
+endif
 ifdef CONFIG_PACKAGE_alljoyn-c
 	$(INSTALL_DIR) $(1)/usr/include/alljoyn_c
 	$(CP) $(PKG_INSTALL_DIR)/c/inc/alljoyn_c/*.h $(1)/usr/include/alljoyn_c/
 	$(CP) $(PKG_INSTALL_DIR)/c/lib/liballjoyn_c.a $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/c/lib/liballjoyn_c.so $(1)/usr/lib/
 endif
-$(call AJServiceInstallDev,about,$(1))
 endef
 
 define Package/alljoyn/conffiles
+/etc/alljoyn/alljoyn.conf
+/etc/config/alljoyn
+endef
+
+define Package/alljoyn-non-gw-config/conffiles
 /etc/config/alljoyn
 endef
 
@@ -192,6 +192,13 @@ define Package/alljoyn/install
 	$(INSTALL_BIN) ./files/alljoyn.defaults $(1)/etc/uci-defaults/alljoyn
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/alljoyn.config $(1)/etc/config/alljoyn
+	$(INSTALL_DIR) $(1)/etc/alljoyn
+	$(INSTALL_CONF) ./files/alljoyn.conf $(1)/etc/alljoyn/alljoyn.conf
+endef
+
+define Package/alljoyn-non-gw-config/install
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) ./files/alljoyn-non-gw.config $(1)/etc/config/alljoyn
 endef
 
 define Package/alljoyn-c/install
@@ -199,12 +206,9 @@ define Package/alljoyn-c/install
 	$(CP) $(PKG_INSTALL_DIR)/c/lib/liballjoyn_c.so $(1)/usr/lib/
 endef
 
-
-
-define SamplesInstall
-ifdef CONFIG_PACKAGE_alljoyn-$(1)
-	$$(INSTALL_BIN) $$(PKG_INSTALL_DIR)/$(1)/bin/* $(2)/usr/bin/
-endif
+define Package/alljoyn-about/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
 endef
 
 define Package/alljoyn-samples/install
@@ -232,7 +236,9 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
-$(call SamplesInstall,about,$(1))
+ifdef CONFIG_PACKAGE_alljoyn-about
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
+endif
 endef
 
 define Package/alljoyn/postinst
@@ -259,7 +265,28 @@ exit 0
 endef
 
 
+define Package/alljoyn-non-gw-config/preinst
+#!/bin/sh
+if [ -z "$${IPKG_INSTROOT}" ]; then
+    echo 'Saving original alljoyn config file to alljoyn-orig'
+    mv /etc/config/alljoyn /etc/config/alljoyn-orig
+fi
+exit 0
+endef
+
+define Package/alljoyn-non-gw-config/postrm
+#!/bin/sh
+if [ -z "$${IPKG_INSTROOT}" ]; then
+    if [ -e /etc/config/alljoyn-orig ]; then
+        echo 'Restoring original alljoyn config file from alljoyn-orig'
+        mv /etc/config/alljoyn-orig /etc/config/alljoyn
+    fi
+fi
+exit 0
+endef
+
 $(eval $(call BuildPackage,alljoyn))
+$(eval $(call BuildPackage,alljoyn-non-gw-config))
 $(eval $(call BuildPackage,alljoyn-c))
 $(eval $(call BuildPackage,alljoyn-about))
 $(eval $(call BuildPackage,alljoyn-samples))
