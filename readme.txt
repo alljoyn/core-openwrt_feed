@@ -52,10 +52,13 @@ make menuconfig
 		< > alljoyn --->
 			< > alljoyn-about
 			< > alljoyn-c
+			< > alljoyn-codegen
 			< > alljoyn-config
 				< > alljoyn-config-samples
 			< > alljoyn-controlpanel
 				< > alljoyn-controlpanel-samples
+			< > alljoyn-ddapi
+				< > alljoyn-ddapi-samples
 			< > alljoyn-notification
 				< > alljoyn-notification-samples
 			< > alljoyn-onboarding
