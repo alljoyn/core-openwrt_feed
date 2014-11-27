@@ -56,6 +56,8 @@ make menuconfig
 				< > alljoyn-config-samples
 			< > alljoyn-controlpanel
 				< > alljoyn-controlpanel-samples
+			< > alljoyn-ddapi
+				< > alljoyn-ddapi-samples
 			< > alljoyn-notification
 				< > alljoyn-notification-samples
 			< > alljoyn-onboarding
