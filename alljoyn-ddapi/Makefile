@@ -14,14 +14,13 @@ PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
 
-#PKG_CONFIG_PATH:=$(STAGING_DIR_HOST)/lib/python:$(PKG_CONFIG_PATH)
-
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_DEBUG \
 	CONFIG_PACKAGE_alljoyn-ddapi-samples
 
 include $(INCLUDE_DIR)/package.mk
 
+PKG_BUILD_DEPENDS:=alljoyn-codegen
 ALLJOYN_BINDINGS:=cpp,
 ALLJOYN_DDAPI_BUILD_SAMPLES:=off
 
@@ -37,8 +36,7 @@ define Package/$(PKG_NAME)
   TITLE:=AllJoyn $(AJ_SERVICE_NAME) library
   DEPENDS:=alljoyn \
 	+alljoyn-about \
-	+alljoyn-services_common \
-	+alljoyn-codegen
+	+alljoyn-services_common
 endef
 
 define Package/$(PKG_NAME)/description
@@ -52,7 +50,6 @@ define Package/$(PKG_NAME)-samples
   DEPENDS:=alljoyn \
 	+alljoyn-about \
 	+alljoyn-services_common \
-	+alljoyn-codegen \
 	+alljoyn-ddapi
 endef
 
