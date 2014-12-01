@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
-PKG_BASE_VERSION:=14.06.00
-PKG_PATCHLEVEL:=a
+PKG_BASE_VERSION:=0.00.01
+PKG_PATCHLEVEL:=
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
 PKG_RELEASE:=1
 PKG_MD5SUM:=b45a9ce7101cd15fc50d387959414bae
@@ -237,6 +237,8 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
 ifdef CONFIG_PACKAGE_alljoyn-about
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutClient $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutService $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
 endif
 endef
