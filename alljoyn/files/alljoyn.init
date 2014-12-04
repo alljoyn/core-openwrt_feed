@@ -61,7 +61,8 @@ process_ip_network() {
     config_get ifname "$network" ifname
     if [ -n "$ifname" ]; then
         export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
-  <listen>tcp:iface=${ifname},port=${port}</listen>"
+  <listen>tcp:iface=${ifname},port=${port}</listen>
+  <listen>udp:iface=${ifname},port=${port}</listen>"
     fi
 }
 
