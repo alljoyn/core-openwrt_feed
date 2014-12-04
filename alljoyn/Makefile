@@ -236,9 +236,9 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
-ifdef CONFIG_PACKAGE_alljoyn-about
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutClient $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutService $(1)/usr/bin/
+ifdef CONFIG_PACKAGE_alljoyn-about
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
 endif
 endef
