@@ -1,6 +1,6 @@
 #!/bin/sh /etc/rc.common
 
-# Copyright (c) 2013-2014, AllSeen Alliance. All rights reserved.
+# Copyright (c) 2013-2015, AllSeen Alliance. All rights reserved.
 #
 #    Permission to use, copy, modify, and/or distribute this software for any
 #    purpose with or without fee is hereby granted, provided that the above
@@ -78,7 +78,8 @@ process_ip_transport() {
 
         if check ip all_networks; then
             export ${NO_EXPORT:+-n} listen_specs="${listen_specs}
-  <listen>tcp:iface=*,port=${port}</listen>"
+  <listen>tcp:iface=*,port=${port}</listen>
+  <listen>udp:iface=*,port=${port}</listen>"
         else
             config_load network
             config_load alljoyn  # loading the network config clobbers the alljoyn config vars
