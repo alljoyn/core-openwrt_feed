@@ -7,8 +7,8 @@ PKG_NAME:=alljoyn-$(AJ_SERVICE)
 PKG_VERSION:=0.0.1
 PKG_RELEASE:=1
 PKG_MD5SUM:=
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
+PKG_BUILD_DIR:=$(BUILD_DIR)/alljoyn-services-$(PKG_VERSION)-src
+PKG_SOURCE:=alljoyn-services-$(PKG_VERSION)-src.tar.gz
 PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
 
 # SCons supports parallel builds but does not support make's jobserver
