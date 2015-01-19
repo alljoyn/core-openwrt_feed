@@ -1,12 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
-PKG_VERSION:=0.0.1
+PKG_BASE_VERSION:=0.0.1
+PKG_PATCHLEVEL:=
 PKG_RELEASE:=1
 PKG_MD5SUM:=
+PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
+PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_BASE_VERSION)/
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
@@ -234,6 +236,8 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutClient $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutService $(1)/usr/bin/
 ifdef CONFIG_PACKAGE_alljoyn-about
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
 endif
