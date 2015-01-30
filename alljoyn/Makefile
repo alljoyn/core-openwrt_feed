@@ -29,7 +29,7 @@ endif
 define Package/alljoyn/Default
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libopenssl +libpthread +librt +libstdcpp
+  DEPENDS:=+libopenssl +libpthread +librt +libstdcpp +libcap
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
