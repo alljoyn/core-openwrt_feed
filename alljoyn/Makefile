@@ -21,10 +21,15 @@ PKG_CONFIG_DEPENDS:= \
 
 include $(INCLUDE_DIR)/package.mk
 
+ifneq ($(CONFIG_CCACHE),)
+  TARGET_CC=$(TARGET_CC_NOCACHE)
+  TARGET_CXX=$(TARGET_CXX_NOCACHE)
+endif
+
 define Package/alljoyn/Default
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libopenssl +libpthread +librt +libstdcpp
+  DEPENDS:=+libopenssl +libpthread +librt +libstdcpp +libcap
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
