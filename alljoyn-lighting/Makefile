@@ -16,8 +16,6 @@ PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
 
 include $(INCLUDE_DIR)/package.mk
 
-# The origin of this chunk of code is from the AllSeen Alliance
-# (see https://git.allseenalliance.org/cgit/core/openwrt_feed.git/commit/?id=e95a9af16c1c06a63b017ff90499592e2a8df384)
 ifneq ($(CONFIG_CCACHE),)
 	TARGET_CC=$(TARGET_CC_NOCACHE)
 	TARGET_CXX=$(TARGET_CXX_NOCACHE)
