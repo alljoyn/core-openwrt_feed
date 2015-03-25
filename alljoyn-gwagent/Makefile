@@ -95,8 +95,8 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/../gatewayController/lib/liballjoyn_gateway.a $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/../gatewayController/lib/liballjoyn_gateway.so $(1)/usr/lib/
-	$(CP) $(PKG_INSTALL_DIR)/../gatewayConnector/lib/liballjoyn_gwConnector.a $(1)/usr/lib/
-	$(CP) $(PKG_INSTALL_DIR)/../gatewayConnector/lib/liballjoyn_gwConnector.so $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/../gatewayConnector/lib/liballjoyn_gwconnector.a $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/../gatewayConnector/lib/liballjoyn_gwconnector.so $(1)/usr/lib/
 endef
 
 
@@ -112,17 +112,17 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/alljoyn
 	$(INSTALL_DIR) $(1)/etc/alljoyn/gwagent
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/GatewayMgmtApp $(1)/usr/bin/alljoyn-gwagent
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/manifest.xsd $(1)/opt/alljoyn/gwagent
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/defaultConfig.xml $(1)/etc/alljoyn/gwagent/gwagent.conf
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/alljoyn-gwagent $(1)/usr/bin/
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/manifest.xsd $(1)/opt/alljoyn/gwagent/
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/gwagent-config.xml $(1)/etc/alljoyn/alljoyn-daemon.d/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/gatewayMgmt.init $(1)/etc/init.d/alljoyn-gwagent
+	$(INSTALL_BIN) ./files/alljoyn-gwagent.init $(1)/etc/init.d/alljoyn-gwagent
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/gatewayMgmt.defaults $(1)/etc/uci-defaults/alljoyn-gwagent
+	$(INSTALL_BIN) ./files/alljoyn-gwagent.defaults $(1)/etc/uci-defaults/alljoyn-gwagent
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/../gatewayController/lib/liballjoyn_gateway.so $(1)/usr/lib/
-	$(CP) $(PKG_INSTALL_DIR)/../gatewayConnector/lib/liballjoyn_gwConnector.so $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/../gatewayConnector/lib/liballjoyn_gwconnector.so $(1)/usr/lib/
 endef
 
 define Package/$(PKG_NAME)/postinst
