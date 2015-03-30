@@ -2,9 +2,9 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
 PKG_BASE_VERSION:=14.12
-PKG_PATCHLEVEL:=a
+PKG_PATCHLEVEL:=b
 PKG_RELEASE:=1
-PKG_MD5SUM:=1435d8611a26bfde115a771ab7cd3d74
+PKG_MD5SUM:=74ed192672f4330022f71c6f72095690
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
 PKG_TARBALL_VERSION:=$(PKG_BASE_VERSION).00$(PKG_PATCHLEVEL)
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_TARBALL_VERSION)-src
@@ -22,10 +22,15 @@ PKG_CONFIG_DEPENDS:= \
 
 include $(INCLUDE_DIR)/package.mk
 
+ifneq ($(CONFIG_CCACHE),)
+  TARGET_CC=$(TARGET_CC_NOCACHE)
+  TARGET_CXX=$(TARGET_CXX_NOCACHE)
+endif
+
 define Package/alljoyn/Default
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libopenssl +libpthread +librt +libstdcpp
+  DEPENDS:=+libopenssl +libpthread +librt +libstdcpp +libcap
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
