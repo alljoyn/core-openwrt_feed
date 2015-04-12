@@ -1,13 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
-PKG_BASE_VERSION:=0.0.1
-PKG_PATCHLEVEL:=
+PKG_BASE_VERSION:=14.12
+PKG_PATCHLEVEL:=b
 PKG_RELEASE:=1
-PKG_MD5SUM:=
+PKG_MD5SUM:=74ed192672f4330022f71c6f72095690
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
+PKG_TARBALL_VERSION:=$(PKG_BASE_VERSION).00$(PKG_PATCHLEVEL)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_TARBALL_VERSION)-src
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_TARBALL_VERSION)-src.tar.gz
 PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_BASE_VERSION)/
 
 # SCons supports parallel builds but does not support make's jobserver
@@ -228,15 +229,12 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbservice $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbsig $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bignum $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/compression $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/keystore $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/marshal $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/names $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/ns $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rawclient $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rawservice $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/remarshal $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rsa $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/sessions $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
