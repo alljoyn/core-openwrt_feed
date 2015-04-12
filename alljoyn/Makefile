@@ -199,7 +199,7 @@ define Package/alljoyn/install
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/alljoyn.config $(1)/etc/config/alljoyn
 	$(INSTALL_DIR) $(1)/etc/alljoyn
-	$(INSTALL_CONF) ./files/alljoyn.conf $(1)/etc/alljoyn/alljoyn.conf
+	$(INSTALL_DATA) ./files/alljoyn.conf $(1)/etc/alljoyn/alljoyn.conf
 endef
 
 define Package/alljoyn-non-gw-config/install
@@ -229,15 +229,12 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbservice $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbsig $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bignum $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/compression $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/keystore $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/marshal $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/names $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/ns $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rawclient $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rawservice $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/remarshal $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rsa $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/sessions $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
