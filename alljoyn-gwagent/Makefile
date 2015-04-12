@@ -4,12 +4,15 @@ AJ_SERVICE_NAME:=Gateway Management
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_VERSION:=0.0.1
+PKG_BASE_VERSION:=14.12
+PKG_PATCHLEVEL:=.00
 PKG_RELEASE:=1
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
-PKG_MD5SUM:=
+PKG_MD5SUM:=f195c9de78365537e588cb578517e6a9
+PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
+PKG_TARBALL_VERSION:=$(PKG_VERSION)
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_TARBALL_VERSION)-src
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_TARBALL_VERSION)-src.tar.gz
+PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_BASE_VERSION)/
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
@@ -112,6 +115,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/alljoyn
 	$(INSTALL_DIR) $(1)/etc/alljoyn/gwagent
+	$(INSTALL_DIR) $(1)/etc/alljoyn/alljoyn-daemon.d
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/alljoyn-gwagent $(1)/usr/bin/
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/manifest.xsd $(1)/opt/alljoyn/gwagent/
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/gwagent-config.xml $(1)/etc/alljoyn/alljoyn-daemon.d/
