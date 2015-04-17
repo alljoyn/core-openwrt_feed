@@ -32,9 +32,7 @@ define Package/$(PKG_NAME)
   CATEGORY:=Network
   DEPENDS:=alljoyn \
     +alljoyn-about \
-    +alljoyn-config \
     +alljoyn-services_common \
-    +alljoyn-notification \
     +libxml2 \
     +shadow-useradd \
     +shadow-userdel
