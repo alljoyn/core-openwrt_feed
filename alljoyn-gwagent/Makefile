@@ -37,7 +37,7 @@ define Package/$(PKG_NAME)
     +shadow-useradd \
     +shadow-userdel
   URL:=http://www.allseenalliance.org
-  MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
+  MAINTAINER:=AllSeen Alliance <allseen-gateway@lists.allseenalliance.org>
   MENU:=1
  endef
 
