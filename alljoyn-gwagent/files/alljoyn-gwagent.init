@@ -1,3 +1,5 @@
+#!/bin/sh /etc/rc.common
+
 # Copyright (c) Open Connectivity Foundation (OCF) and AllJoyn Open
 #    Source Project (AJOSP) Contributors and others.
 #
@@ -26,22 +28,20 @@
 #     PERFORMANCE OF THIS SOFTWARE.
 #
 
-findPid=$(pgrep /usr/sbin/wifi_scan)
+START=75
+SERVICE_DAEMONIZE=1
+SERVICE_WRITE_PID=1
+SERVICE_SIG_STOP="INT"
 
-if [ -z $findPid ]; then
+boot() {
+	start
+}
 
-    ## Get the scan results based on method available
-    hasIw=$(which iw)
-    hasIwList=$(which iwlist)
+start() {
+	cd /opt/alljoyn/gwagent
+	service_start /usr/bin/alljoyn-gwagent --gwagent-policy-file=/etc/alljoyn/gwagent/gwagent.conf --apps-policy-dir=/etc/alljoyn/gwagent-apps
+}
 
-    if [ -n "$hasIw" ]; then
-        result=$(/usr/sbin/parse_iw_wifi_scan)
-    elif [ -n "$hasIwList" ]; then
-        result=$(/usr/sbin/parse_iwlist_wifi_scan)
-    fi
-
-    ## Sort the results based on signal strength and print it to the file
-    if [ -n "$result" ]; then
-        printf "$result" | sort -n -r | awk '{sep="";for (i=4;i<=NF;i++) {printf "%s%s",sep, $i;sep=" "}; printf "\t"$3"\n"}' | sort | uniq > /tmp/wifi_scan_results
-    fi
-fi
+stop() {
+	service_stop /usr/bin/alljoyn-gwagent
+}
