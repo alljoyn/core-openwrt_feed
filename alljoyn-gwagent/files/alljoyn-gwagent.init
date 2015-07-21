@@ -28,12 +28,20 @@
 #     PERFORMANCE OF THIS SOFTWARE.
 #
 
-START=61
+START=75
+SERVICE_DAEMONIZE=1
+SERVICE_WRITE_PID=1
+SERVICE_SIG_STOP="INT"
 
 boot() {
-# Schedule the script to refresh the results with a cron job
-    /etc/init.d/cron stop
-    sed -i '/\/usr\/sbin\/wifi_scan/d' /etc/crontabs/root
-    echo '*/15 * * * * /usr/sbin/wifi_scan' >> /etc/crontabs/root
-    /etc/init.d/cron start
+	start
+}
+
+start() {
+	cd /opt/alljoyn/gwagent
+	service_start /usr/bin/alljoyn-gwagent --gwagent-policy-file=/etc/alljoyn/gwagent/gwagent.conf --apps-policy-dir=/etc/alljoyn/gwagent-apps
+}
+
+stop() {
+	service_stop /usr/bin/alljoyn-gwagent
 }
