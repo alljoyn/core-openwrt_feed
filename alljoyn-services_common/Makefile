@@ -4,15 +4,15 @@ AJ_SERVICE_NAME:=Services Common
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_BASE_VERSION:=15.04
-PKG_PATCHLEVEL:=.00
+PKG_BASE_VERSION:=15.09
+PKG_PATCHLEVEL:=.00dev
 PKG_RELEASE:=1
-PKG_MD5SUM:=fab340606d98f83d7d718a30aede033b
+PKG_MD5SUM:=
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
-PKG_TARBALL_VERSION:=$(PKG_VERSION)
-PKG_BUILD_DIR:=$(BUILD_DIR)/alljoyn-services-$(PKG_TARBALL_VERSION)-src
-PKG_SOURCE:=alljoyn-services-$(PKG_TARBALL_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_BASE_VERSION)/
+PKG_BUILD_DIR:=$(BUILD_DIR)/alljoyn-services-$(PKG_VERSION)-src
+PKG_SOURCE:=alljoyn-services-$(PKG_VERSION)-src.tar.gz
+#PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_BASE_VERSION)/
+PKG_SOURCE_URL:=https://build.allseenalliance.org/ci/job/master-source-extraction/lastSuccessfulBuild/artifact/depot/
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
