@@ -1,12 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ajtcl-services
-PKG_VERSION:=0.0.1
+PKG_VERSION:=15.09.00dev
 PKG_RELEASE:=1
 PKG_MD5SUM:=
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
+PKG_SOURCE_URL:=https://build.allseenalliance.org/ci/job/master-source-extraction/lastSuccessfulBuild/artifact/depot/
+
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
@@ -27,7 +28,6 @@ endef
 define Package/$(PKG_NAME)
 $(call Package/$(PKG_NAME)/Default)
   TITLE:=AllJoyn Thin Client - Base Services
-  MENU:=0
 endef
 
 define Package/$(PKG_NAME)/description
@@ -36,15 +36,16 @@ the AllJoyn Thin Client C library for developing ad hoc peer-to-peer
 applications that use the AllJoyn protocol.
 endef
 
-#define Package/$(PKG_NAME)-samples
-#$(call Package/$(PKG_NAME)/Default)
-#  TITLE:=AllJoyn Thin Client - Base Services - testing samples
-#  DEPENDS:=ajtcl
-#endef
+define Package/$(PKG_NAME)-samples
+$(call Package/$(PKG_NAME)/Default)
+  TITLE:=AllJoyn Thin Client - Base Services - samples
+  DEPENDS:=$(PKG_NAME)
+endef
 
-#define Package/$(PKG_NAME)-samples/description
-#Alljoyn Thin Client Base Services samples.  (This is primarily for testing.)
-#endef
+define Package/$(PKG_NAME)-samples/description
+Alljoyn Thin Client Base Services samples.  (This is primarily for testing.  Do not
+include in production builds.)
+endef
 
 ifeq ($(CONFIG_DEBUG),y)
   ALLJOYN_BUILD_VARIANT:=debug
@@ -59,60 +60,33 @@ endef
 TARGET_CFLAGS+=-I$(STAGING_DIR)/usr/include/ajtcl
 
 define Build/Compile
-	TARGET_CC_NOCACHE="$(TARGET_CC_NOCACHE)" \
-	TARGET_CXX_NOCACHE="$(TARGET_CXX_NOCACHE)" \
-	TARGET_LINK="$(TARGET_CC_NOCACHE)" \
-	STAGING_DIR="$(STAGING_DIR)" \
-	TARGET_PATH="$(TARGET_PATH)" \
-	TARGET_CFLAGS="$(TARGET_CFLAGS)" \
-	EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
-	TARGET_CPPFLAGS="$(TARGET_CPPFLAGS)" \
-	TARGET_LINKFLAGS="$(TARGET_LINKFLAGS)" \
-	TARGET_LDFLAGS="$(TARGET_LDFLAGS)" \
-	TARGET_PATH="$(PATH)" \
+	CROSS_CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS) $(TARGET_CPPFLAGS)" \
+	CROSS_LINKFLAGS="$(TARGET_LINKFLAGS) $(TARGET_LDFLAGS)" \
+	CROSS_PATH=$(TARGET_PATH) \
+	CROSS_PREFIX=$(TARGET_CC:gcc=) \
 	scons -C $(PKG_BUILD_DIR) \
-		-f SConstruct.openwrt \
 		$(PKG_JOBS) \
+		WS=off \
+		TARG=linux \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)"
 endef
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn
-
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn/config
-	$(CP) $(PKG_BUILD_DIR)/config/inc/alljoyn/config/*.h $(1)/usr/include/ajtcl/alljoyn/config
-
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn/controlpanel
-	$(CP) $(PKG_BUILD_DIR)/controlpanel/inc/alljoyn/controlpanel/*.h $(1)/usr/include/ajtcl/alljoyn/controlpanel
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn/controlpanel/Common
-	$(CP) $(PKG_BUILD_DIR)/controlpanel/inc/alljoyn/controlpanel/Common/*.h $(1)/usr/include/ajtcl/alljoyn/controlpanel/Common
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn/controlpanel/Widgets
-	$(CP) $(PKG_BUILD_DIR)/controlpanel/inc/alljoyn/controlpanel/Widgets/*.h $(1)/usr/include/ajtcl/alljoyn/controlpanel/Widgets
-
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn/notification
-	$(CP) $(PKG_BUILD_DIR)/notification/inc/alljoyn/notification/*.h $(1)/usr/include/ajtcl/alljoyn/notification
-
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn/onboarding
-	$(CP) $(PKG_BUILD_DIR)/onboarding/inc/alljoyn/onboarding/*.h $(1)/usr/include/ajtcl/alljoyn/onboarding
-
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl/alljoyn/services_common
-	$(CP) $(PKG_BUILD_DIR)/services_common/inc/alljoyn/services_common/*.h $(1)/usr/include/ajtcl/alljoyn/services_common
-
+	$(CP) -R $(PKG_BUILD_DIR)/dist/include/ajtcl $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/libajtcl_services.a $(1)/usr/lib/
-	$(CP) $(PKG_BUILD_DIR)/libajtcl_services.so $(1)/usr/lib/
+	$(CP) $(PKG_BUILD_DIR)/dist/lib/libajtcl_services.* $(1)/usr/lib/
 endef
 
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/libajtcl_services.so $(1)/usr/lib/
+	$(CP) $(PKG_BUILD_DIR)/dist/lib/libajtcl_services.so $(1)/usr/lib/
 endef
 
-#define Package/$(PKG_NAME)-samples/install
-#	$(INSTALL_DIR) $(1)/usr/bin
-#endef
+define Package/$(PKG_NAME)-samples/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(CP) $(PKG_BUILD_DIR)/dist/bin/* $(1)/usr/bin/
+endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
-#$(eval $(call BuildPackage,$(PKG_NAME)-samples))
+$(eval $(call BuildPackage,$(PKG_NAME)-samples))

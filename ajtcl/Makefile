@@ -1,12 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ajtcl
-PKG_VERSION:=0.0.1
+PKG_VERSION:=15.09.00dev
 PKG_RELEASE:=1
 PKG_MD5SUM:=
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)-src
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
-PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_VERSION)/
+PKG_SOURCE_URL:=https://build.allseenalliance.org/ci/job/master-source-extraction/lastSuccessfulBuild/artifact/depot/
+
 
 # SCons supports parallel builds but does not support make's jobserver
 PKG_BUILD_PARALLEL:=$(if $(CONFIG_PKG_BUILD_USE_JOBSERVER),0,1)
@@ -19,30 +20,42 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ajtcl/Default
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libopenssl +libpthread +librt
+  DEPENDS:=+libpthread +librt
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
+  TITLE:=AllJoyn Thin Client Library
 endef
 
 define Package/ajtcl
 $(call Package/ajtcl/Default)
-  TITLE:=AllJoyn Thin Client Library
-  MENU:=1
 endef
 
 define Package/ajtcl/description
 AllJoyn Thin Client Library is a basic, low-level C library for developing
-ad hoc peer-to-peer applications that use the AllJoyn protocol.
+ad hoc peer-to-peer applications that use the AllJoyn protocol.  This version
+uses built-in cryptographic hash functions.
 endef
 
 define Package/ajtcl-samples
 $(call Package/ajtcl/Default)
-  TITLE:=AllJoyn Thin Client Library - testing samples
+  TITLE+= - samples
   DEPENDS:=ajtcl
 endef
 
 define Package/ajtcl-samples/description
-Alljoyn Thin Client Library samples.  (This is primarily for testing.)
+Alljoyn Thin Client Library samples.  (This is primarily for testing.  Do not
+include in production builds.)
+endef
+
+define Package/ajtcl-tests
+$(call Package/ajtcl/Default)
+  TITLE+= - tests
+  DEPENDS:=ajtcl
+endef
+
+define Package/ajtcl-tests/description
+Alljoyn Thin Client Library tests.  (This is primarily for testing.  Do not
+include in production builds.)
 endef
 
 ifeq ($(CONFIG_DEBUG),y)
@@ -56,7 +69,7 @@ define Build/Configure/Default
 endef
 
 define Build/Compile
-	CROSS_CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS) $(TARGET_CPPFLAGS) -DOPENWRT_MIPS" \
+	CROSS_CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS) $(TARGET_CPPFLAGS)" \
 	CROSS_LINKFLAGS="$(TARGET_LINKFLAGS) $(TARGET_LDFLAGS)" \
 	CROSS_PATH=$(TARGET_PATH) \
 	CROSS_PREFIX=$(TARGET_CC:gcc=) \
@@ -64,44 +77,37 @@ define Build/Compile
 		$(PKG_JOBS) \
 		WS=off \
 		TARG=linux \
-		"VARIANT=$(ALLJOYN_BUILD_VARIANT)"
+		"VARIANT=$(ALLJOYN_BUILD_VARIANT)" \
+		"AJ_CRYPTO=builtin"
 endef
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
-	$(INSTALL_DIR) $(1)/usr/include/ajtcl
-	$(CP) $(PKG_BUILD_DIR)/inc/*.h $(1)/usr/include/ajtcl/
-	$(CP) $(PKG_BUILD_DIR)/target/linux/*.h $(1)/usr/include/ajtcl/
+	$(CP) -R $(PKG_BUILD_DIR)/dist/include/ajtcl $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/libajtcl_st.a $(1)/usr/lib/libajtcl.a
-	$(CP) $(PKG_BUILD_DIR)/libajtcl.so $(1)/usr/lib/
+	$(CP) $(PKG_BUILD_DIR)/dist/lib/libajtcl.* $(1)/usr/lib/
 endef
 
 define Package/ajtcl/install
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/libajtcl.so $(1)/usr/lib/
+	$(CP) $(PKG_BUILD_DIR)/dist/lib/libajtcl.so $(1)/usr/lib/
+endef
+
+define Package/ajtcl-openssl/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_BUILD_DIR)/dist/lib/libajtcl.so $(1)/usr/lib/
 endef
 
 define Package/ajtcl-samples/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/samples/secure/SecureClient $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/samples/secure/SecureService $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/samples/basic/basic_service $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/samples/basic/basic_client $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/samples/basic/signal_service $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/samples/basic/nameChange_client $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/samples/basic/signalConsumer_client $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/mutter $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/ajlite $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/aestest $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/aesbench $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/svclite $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/clientlite $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/siglite $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/sessions $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/nvramtest $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/test/bastress2 $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dist/bin/* $(1)/usr/bin/
+endef
+
+define Package/ajtcl-tests/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dist/test/* $(1)/usr/bin/
 endef
 
 $(eval $(call BuildPackage,ajtcl))
 $(eval $(call BuildPackage,ajtcl-samples))
+$(eval $(call BuildPackage,ajtcl-tests))
