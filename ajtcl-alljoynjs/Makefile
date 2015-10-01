@@ -21,7 +21,7 @@ define Package/$(PKG_NAME)
   TITLE:=AllJoyn Thin Client - AllJoyn JS
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+ajtcl +ajtcl-services
+  DEPENDS:=ajtcl +ajtcl-services
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
@@ -48,8 +48,6 @@ else
   ALLJOYN_BUILD_VARIANT:=release
 endif
 
-TARGET_CFLAGS+=-D_POSIX_C_SOURCE
-
 define Build/Configure/Default
 # Override default to do nothing
 endef
@@ -63,7 +61,7 @@ define Build/Compile
 		$(PKG_JOBS) \
 		WS=off \
 		TARG=linux \
-		V=1 \
+		V=0 \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)"
 endef
 
