@@ -4,7 +4,7 @@ AJ_SERVICE_NAME:=Gateway Management
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_BASE_VERSION:=14.12
+PKG_BASE_VERSION:=15.04
 PKG_PATCHLEVEL:=.00
 PKG_RELEASE:=1
 PKG_MD5SUM:=f195c9de78365537e588cb578517e6a9
@@ -32,6 +32,7 @@ define Package/$(PKG_NAME)
   CATEGORY:=Network
   DEPENDS:=alljoyn \
     +alljoyn-about \
+	 +alljoyn-config \
     +alljoyn-services_common \
     +libxml2 \
     +shadow-useradd \
