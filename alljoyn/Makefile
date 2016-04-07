@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
-PKG_BASE_VERSION:=15.04
+PKG_BASE_VERSION:=16.04
 PKG_PATCHLEVEL:=b
 PKG_RELEASE:=1
 PKG_MD5SUM:=5abf1ac640258eeb04617e39018536a7
@@ -120,6 +120,7 @@ endif
 
 
 PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist
+PKG_INSTALL_TEST_DIR:=$(PKG_BUILD_DIR)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/test
 
 TARGET_CFLAGS+=-fPIC
 TARGET_CPPFLAGS+=-fPIC
@@ -219,26 +220,27 @@ endef
 
 define Package/alljoyn-samples/install
 	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/aes_ccm $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/bastress $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/bignum $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/bbjitter $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/marshal $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/names $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/remarshal $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/socktest $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/srp $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/unpack $(1)/usr/bin/
+
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/advtunnel $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/aes_ccm $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bastress $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bastress2 $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbclient $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbjitter $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbjoin $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbservice $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbsig $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bignum $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/marshal $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/names $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/ns $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rawclient $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/rawservice $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/remarshal $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/sessions $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/socktest $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/srp $(1)/usr/bin/
-	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/unpack $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutClient $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutService $(1)/usr/bin/
 ifdef CONFIG_PACKAGE_alljoyn-about
