@@ -135,6 +135,10 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/alljoyn-gwagent $(1)/usr/bin
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/manifest.xsd $(1)/opt/alljoyn/gwagent
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/gwagent-config.xml $(1)/etc/alljoyn/gwagent/gwagent.conf
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/installPackage.sh $(1)/opt/alljoyn/app-manager
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/removePackage.sh $(1)/opt/alljoyn/app-manager
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/bin/gwApp-config.xml $(1)/opt/alljoyn/gwagent
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/gateway/$(AJ_SERVICE)/cpp/GatewayMgmtApp/notifications.acl $(1)/opt/alljoyn/apps
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/alljoyn-gwagent.init $(1)/etc/init.d/alljoyn-gwagent
