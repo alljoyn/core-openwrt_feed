@@ -4,10 +4,10 @@ AJ_SERVICE_NAME:=onboarding
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_BASE_VERSION:=15.04
+PKG_BASE_VERSION:=16.04
 PKG_PATCHLEVEL:=.00
-PKG_RELEASE:=2
-PKG_MD5SUM:=fab340606d98f83d7d718a30aede033b
+PKG_RELEASE:=1
+#PKG_MD5SUM:=389c2623619281e6849da25cee7e1bb7
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
 PKG_TARBALL_VERSION:=$(PKG_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/alljoyn-services-$(PKG_TARBALL_VERSION)-src
@@ -34,12 +34,12 @@ define Package/$(PKG_NAME)
   SECTION:=net
   CATEGORY:=Network
   DEPENDS:=alljoyn \
-	wpa-supplicant \
-	+alljoyn-about \
-	+alljoyn-config \
-	+alljoyn-services_common \
-	+hostapd \
-	+wpa-cli
+		wpa-supplicant \
+		+alljoyn-about \
+		+alljoyn-config \
+		+alljoyn-services_common \
+		+hostapd \
+		+wpa-cli
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
@@ -65,6 +65,8 @@ define Build/Configure/Default
 # Override default to do nothing
 endef
 
+ALLJOYN_BUILD_SERVICES_SAMPLES:=on
+
 define Build/Compile
 	scons -C $(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE) \
 		$(PKG_JOBS) \
@@ -72,7 +74,7 @@ define Build/Compile
 		CPU=openwrt \
 		OS=openwrt \
 		"BINDINGS=$(ALLJOYN_BINDINGS)" \
-		"BUILD_SERVICES_SAMPLES=off" \
+		"BUILD_SERVICES_SAMPLES=$(ALLJOYN_BUILD_SERVICES_SAMPLES)" \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)" \
 		BR=off \
 		BT=off \
@@ -104,6 +106,7 @@ define Package/$(PKG_NAME)/install
 
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/onboarding-daemon $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/OnboardingClient $(1)/usr/bin/
 
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -156,5 +159,3 @@ exit 0
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
-
-

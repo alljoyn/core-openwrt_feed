@@ -4,10 +4,10 @@ AJ_SERVICE_NAME:=sample_apps
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_BASE_VERSION:=15.04
+PKG_BASE_VERSION:=16.04
 PKG_PATCHLEVEL:=.00
 PKG_RELEASE:=1
-PKG_MD5SUM:=fab340606d98f83d7d718a30aede033b
+#PKG_MD5SUM:=389c2623619281e6849da25cee7e1bb7
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
 PKG_TARBALL_VERSION:=$(PKG_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/alljoyn-services-$(PKG_TARBALL_VERSION)-src
@@ -34,11 +34,11 @@ define Package/$(PKG_NAME)
   SECTION:=net
   CATEGORY:=Network
   DEPENDS:=alljoyn \
-	+alljoyn-about \
-	+alljoyn-config \
-	+alljoyn-controlpanel \
-	+alljoyn-notification \
-	+alljoyn-services_common
+		+alljoyn-about \
+		+alljoyn-config \
+		+alljoyn-controlpanel \
+		+alljoyn-notification \
+		+alljoyn-services_common
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
@@ -100,5 +100,3 @@ endef
 
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
-
-
