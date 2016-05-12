@@ -34,8 +34,6 @@ define Package/$(PKG_NAME)
   SECTION:=net
   CATEGORY:=Network
   DEPENDS:=alljoyn \
-	+alljoyn-about \
-	+alljoyn-config \
 	+alljoyn-controlpanel \
 	+alljoyn-notification \
 	+alljoyn-services_common

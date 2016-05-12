@@ -18,6 +18,7 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_DEBUG \
 	CONFIG_PACKAGE_alljoyn-c \
 	CONFIG_PACKAGE_alljoyn-about \
+	CONFIG_PACKAGE_alljoyn-config \
 	CONFIG_PACKAGE_alljoyn-samples
 
 include $(INCLUDE_DIR)/package.mk
@@ -87,11 +88,23 @@ provided by About has been integrated into liballjoyn with a simpler API.  This
 library will continue to be supported into 2015 and will be removed in 2016.
 endef
 
+define Package/alljoyn-config
+$(call Package/alljoyn/Default)
+	TITLE:=AllJoyn $(AJ_SERVICE_NAME) service library
+	DEPENDS:=alljoyn \
+		+PACKAGE_alljoyn-about:alljoyn-about
+endef
+
+define Package/alljoyn-config/description
+AllJoyn Config service library.
+endef
+
 define Package/alljoyn-samples
 $(call Package/alljoyn/Default)
   TITLE:=AllJoyn - testing samples
   DEPENDS:=alljoyn \
-	+PACKAGE_alljoyn-about:alljoyn-about
+	+PACKAGE_alljoyn-about:alljoyn-about \
+	+PACKAGE_alljoyn-about:alljoyn-config
 endef
 
 define Package/alljoyn-samples/description
@@ -111,6 +124,9 @@ ifdef CONFIG_PACKAGE_alljoyn-about
   ALLJOYN_SERVICES+=about,
 endif
 
+ifdef CONFIG_PACKAGE_alljoyn-config
+  ALLJOYN_SERVICES+=config,
+endif
 
 ifeq ($(CONFIG_DEBUG),y)
   ALLJOYN_BUILD_VARIANT:=debug
@@ -124,6 +140,12 @@ PKG_INSTALL_TEST_DIR:=$(PKG_BUILD_DIR)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VAR
 
 TARGET_CFLAGS+=-fPIC
 TARGET_CPPFLAGS+=-fPIC
+
+ifdef CONFIG_PACKAGE_$(PKG_NAME)-samples
+  ifdef CONFIG_PACKAGE_alljoyn-about
+    ALLJOYN_BUILD_SERVICES_SAMPLES:=on
+  endif
+endif
 
 define Build/Configure
 # Override default to do nothing
@@ -165,12 +187,21 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn.a $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn.so $(1)/usr/lib/
+
 ifdef CONFIG_PACKAGE_alljoyn-about
 	$(INSTALL_DIR) $(1)/usr/include/alljoyn/about
 	$(CP) $(PKG_INSTALL_DIR)/cpp/inc/alljoyn/about/*.h $(1)/usr/include/alljoyn/about
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.a $(1)/usr/lib/
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
 endif
+
+ifdef CONFIG_PACKAGE_alljoyn-config
+	$(INSTALL_DIR) $(1)/usr/include/alljoyn/config
+	$(CP) $(PKG_INSTALL_DIR)/cpp/inc/alljoyn/config/*.h $(1)/usr/include/alljoyn/config
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_config.a $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_config.so $(1)/usr/lib/
+endif
+
 ifdef CONFIG_PACKAGE_alljoyn-c
 	$(INSTALL_DIR) $(1)/usr/include/alljoyn_c
 	$(CP) $(PKG_INSTALL_DIR)/c/inc/alljoyn_c/*.h $(1)/usr/include/alljoyn_c/
@@ -218,6 +249,11 @@ define Package/alljoyn-about/install
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_about.so $(1)/usr/lib/
 endef
 
+define Package/alljoyn-config/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn_config.so $(1)/usr/lib/
+endef
+
 define Package/alljoyn-samples/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/aes_ccm $(1)/usr/bin/
@@ -230,7 +266,6 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/socktest $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/srp $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_TEST_DIR)/cpp/bin/unpack $(1)/usr/bin/
-
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/advtunnel $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bastress2 $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/bbclient $(1)/usr/bin/
@@ -245,6 +280,13 @@ define Package/alljoyn-samples/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/AboutService $(1)/usr/bin/
 ifdef CONFIG_PACKAGE_alljoyn-about
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/sample_rule_app $(1)/usr/bin/
+endif
+
+ifdef CONFIG_PACKAGE_alljoyn-config
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/ConfigClient $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/samples/ConfigService $(1)/usr/bin/
+	$(INSTALL_DIR) $(1)/etc/alljoyn-config
+	$(CP) $(PKG_BUILD_DIR)/services/config/cpp/samples/ConfigServiceSample/ConfigService.conf $(1)/etc/alljoyn-config/
 endif
 endef
 
@@ -296,4 +338,5 @@ $(eval $(call BuildPackage,alljoyn))
 $(eval $(call BuildPackage,alljoyn-non-gw-config))
 $(eval $(call BuildPackage,alljoyn-c))
 $(eval $(call BuildPackage,alljoyn-about))
+$(eval $(call BuildPackage,alljoyn-config))
 $(eval $(call BuildPackage,alljoyn-samples))
