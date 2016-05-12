@@ -35,8 +35,6 @@ define Package/$(PKG_NAME)
   CATEGORY:=Network
   DEPENDS:=alljoyn \
 	wpa-supplicant \
-	+alljoyn-about \
-	+alljoyn-config \
 	+alljoyn-services_common \
 	+hostapd \
 	+wpa-cli
