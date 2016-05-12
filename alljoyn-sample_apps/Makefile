@@ -34,9 +34,11 @@ define Package/$(PKG_NAME)
   SECTION:=net
   CATEGORY:=Network
   DEPENDS:=alljoyn \
-	+alljoyn-controlpanel \
-	+alljoyn-notification \
-	+alljoyn-services_common
+		+alljoyn-about \
+		+alljoyn-config \
+		+alljoyn-controlpanel \
+		+alljoyn-notification \
+		+alljoyn-services_common
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef

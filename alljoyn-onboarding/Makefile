@@ -34,10 +34,12 @@ define Package/$(PKG_NAME)
   SECTION:=net
   CATEGORY:=Network
   DEPENDS:=alljoyn \
-	wpa-supplicant \
-	+alljoyn-services_common \
-	+hostapd \
-	+wpa-cli
+		wpa-supplicant \
+		+alljoyn-about \
+		+alljoyn-config \
+		+alljoyn-services_common \
+		+hostapd \
+		+wpa-cli
   URL:=http://www.allseenalliance.org
   MAINTAINER:=AllSeen Alliance <allseen-core@lists.allseenalliance.org>
 endef
@@ -63,6 +65,8 @@ define Build/Configure/Default
 # Override default to do nothing
 endef
 
+ALLJOYN_BUILD_SERVICES_SAMPLES:=on
+
 define Build/Compile
 	scons -C $(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE) \
 		$(PKG_JOBS) \
@@ -70,7 +74,7 @@ define Build/Compile
 		CPU=openwrt \
 		OS=openwrt \
 		"BINDINGS=$(ALLJOYN_BINDINGS)" \
-		"BUILD_SERVICES_SAMPLES=off" \
+		"BUILD_SERVICES_SAMPLES=$(ALLJOYN_BUILD_SERVICES_SAMPLES)" \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)" \
 		BR=off \
 		BT=off \
@@ -102,6 +106,7 @@ define Package/$(PKG_NAME)/install
 
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/onboarding-daemon $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/bin/OnboardingClient $(1)/usr/bin/
 
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/init.d
