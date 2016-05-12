@@ -2,9 +2,9 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn
 PKG_BASE_VERSION:=16.04
-PKG_PATCHLEVEL:=b
+PKG_PATCHLEVEL:=
 PKG_RELEASE:=1
-PKG_MD5SUM:=5abf1ac640258eeb04617e39018536a7
+#PKG_MD5SUM:=74ed192672f4330022f71c6f72095690
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
 PKG_TARBALL_VERSION:=$(PKG_BASE_VERSION).00$(PKG_PATCHLEVEL)
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_TARBALL_VERSION)-src
@@ -139,7 +139,7 @@ define Build/Compile
 		"SERVICES=$(ALLJOYN_SERVICES)" \
 		"BUILD_SERVICES_SAMPLES=$(ALLJOYN_BUILD_SERVICES_SAMPLES)" \
 		"VARIANT=$(ALLJOYN_BUILD_VARIANT)" \
-		BR=off \
+		BR=on \
 		ICE=off \
 		POLICYDB=on \
 		"TARGET_CC=$$(TARGET_CC)" \
@@ -297,4 +297,3 @@ $(eval $(call BuildPackage,alljoyn-non-gw-config))
 $(eval $(call BuildPackage,alljoyn-c))
 $(eval $(call BuildPackage,alljoyn-about))
 $(eval $(call BuildPackage,alljoyn-samples))
-
