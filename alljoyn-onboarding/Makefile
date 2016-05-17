@@ -55,6 +55,7 @@ else
 endif
 
 
+ALLJOYN_DISTDIR:=$(BUILD_DIR)/alljoyn-$(PKG_VERSION)-src/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist
 PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist/$(AJ_SERVICE)
 
 TARGET_CFLAGS+=-fPIC
@@ -88,7 +89,8 @@ define Build/Compile
 		"TARGET_LINK=$$(TARGET_CC)" \
 		"TARGET_AR=$$(TARGET_AR)" \
 		"TARGET_RANLIB=$$(TARGET_RANLIB)" \
-		"STAGING_DIR=$$(STAGING_DIR)"
+		"STAGING_DIR=$$(STAGING_DIR)" \
+		"ALLJOYN_DISTDIR=$$(ALLJOYN_DISTDIR)"
 endef
 
 define Build/InstallDev
