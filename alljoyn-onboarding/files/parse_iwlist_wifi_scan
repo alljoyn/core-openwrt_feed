@@ -50,24 +50,32 @@ iwlist scanning 2> /dev/null |
                 case "$line" in
                     *WPA2* )
                         enc="WPA2"
+                        ccmp=""
+                        tkip=""
+                        psk=""
                         ;;
                     *WPA* )
-                        enc="WPA"
+                        if [ "$enc" != "WPA2" ]; then
+                            enc="WPA"
+                            ccmp=""
+                            tkip=""
+                            psk=""
+                        fi
                         ;;
                 esac
                 ;;
             Pairwise* )
                 ## Set the appropriate cipher variables
-                if [ $(echo $line | grep "CCMP" | wc -l) -ne 0 ]; then
+                if [ -z "$ccmp" -a $(echo $line | grep "CCMP" | wc -l) -ne 0 ]; then
                     ccmp="CCMP"
                 fi
-                if [ $(echo $line | grep "TKIP" | wc -l) -ne 0 ]; then
+                if [ -z "$tkip" -a $(echo $line | grep "TKIP" | wc -l) -ne 0 ]; then
                     tkip="TKIP"
                 fi
                 ;;
             Authentication* )
                 ## Set the appropriate Authentication Suite variable
-                if [ $(echo $line | grep "PSK" | wc -l) -ne 0 ]; then
+                if [ -z "$psk" -a $(echo $line | grep "PSK" | wc -l) -ne 0 ]; then
                     psk="PSK";
                 fi
                 ;;
