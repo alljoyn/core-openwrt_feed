@@ -124,10 +124,20 @@ connect() {
 offboard() {
     set_state $STATE_NOTCONFIGURED
     softap
+
     uci delete alljoyn-onboarding.@onboarding[0].ssid
+
+    local enc=$(uci get alljoyn-onboarding.@onboarding[0].encryption)
+    if [ $enc == "wep" ]; then
+        local index=$(uci get alljoyn-onboarding.@onboarding[0].key)
+        uci delete alljoyn-onboarding.@onboarding[0].key$index
+    fi
+
     uci delete alljoyn-onboarding.@onboarding[0].encryption
     uci delete alljoyn-onboarding.@onboarding[0].key
+
     uci commit alljoyn-onboarding
+
     set_error $ERROR_NONE "Unconfigured"
 }
 
