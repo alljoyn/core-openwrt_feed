@@ -4,14 +4,14 @@ AJ_SERVICE_NAME:=Services Common
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alljoyn-$(AJ_SERVICE)
-PKG_BASE_VERSION:=15.04
+PKG_BASE_VERSION:=16.04
 PKG_PATCHLEVEL:=.00
 PKG_RELEASE:=1
-PKG_MD5SUM:=fab340606d98f83d7d718a30aede033b
+#PKG_MD5SUM:=389c2623619281e6849da25cee7e1bb7
 PKG_VERSION:=$(PKG_BASE_VERSION)$(PKG_PATCHLEVEL)
 PKG_TARBALL_VERSION:=$(PKG_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/alljoyn-services-$(PKG_TARBALL_VERSION)-src
-PKG_SOURCE:=alljoyn-services-$(PKG_TARBALL_VERSION)-src.tar.gz
+PKG_SOURCE:=alljoyn-base-$(PKG_TARBALL_VERSION).tar.gz
 PKG_SOURCE_URL:=https://allseenalliance.org/releases/alljoyn/$(PKG_BASE_VERSION)/
 
 # SCons supports parallel builds but does not support make's jobserver
@@ -46,8 +46,8 @@ else
   ALLJOYN_BUILD_VARIANT:=release
 endif
 
-
-PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist/$(AJ_SERVICE)
+ALLJOYN_DISTDIR:=$(BUILD_DIR)/alljoyn-$(PKG_VERSION)-src/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist
+PKG_INSTALL_DIR:=$(PKG_BUILD_DIR)/$(AJ_SERVICE)/build/openwrt/openwrt/$(ALLJOYN_BUILD_VARIANT)/dist/$(AJ_SERVICE)
 
 TARGET_CFLAGS+=-fPIC
 TARGET_CPPFLAGS+=-fPIC
@@ -57,7 +57,7 @@ define Build/Configure/Default
 endef
 
 define Build/Compile
-	scons -C $(PKG_BUILD_DIR)/services/base/$(AJ_SERVICE) \
+	scons -C $(PKG_BUILD_DIR)/$(AJ_SERVICE) \
 		$(PKG_JOBS) \
 		WS=off \
 		CPU=openwrt \
@@ -77,7 +77,8 @@ define Build/Compile
 		"TARGET_LINK=$$(TARGET_CC)" \
 		"TARGET_AR=$$(TARGET_AR)" \
 		"TARGET_RANLIB=$$(TARGET_RANLIB)" \
-		"STAGING_DIR=$$(STAGING_DIR)"
+		"STAGING_DIR=$$(STAGING_DIR)" \
+		"ALLJOYN_DISTDIR=$$(ALLJOYN_DISTDIR)"
 endef
 
 define Build/InstallDev
