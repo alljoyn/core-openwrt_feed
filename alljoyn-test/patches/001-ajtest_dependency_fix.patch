@@ -1,0 +1,20 @@
+--- a/scl/SConstruct
++++ b/scl/SConstruct
+@@ -20,7 +20,7 @@ if os.environ.has_key('AJ_CORE_SRC_DIR')
+     env['AJ_CORE_SRC_DIR'] = os.environ['AJ_CORE_SRC_DIR']
+ else:
+     default_alljoyn_src_location = '../../alljoyn'
+-    print 'Environment variable AJ_CORE_SRC_DIR is not set. Assuming it to be: ' + default_alljoyn_src_location 
++    print 'Environment variable AJ_CORE_SRC_DIR is not set. Assuming it to be: ' + default_alljoyn_src_location
+     env = SConscript(default_alljoyn_src_location + '/build_core/SConscript')
+     env['AJ_CORE_SRC_DIR'] = default_alljoyn_src_location
+ 
+@@ -28,8 +28,6 @@ vars = Variables()
+ vars.Add(PathVariable('AJ_CORE_DIST_DIR', 'Location of the core sdk directory',
+                       env['AJ_CORE_SRC_DIR'] + '/build/' +
+                       env['OS'] + '/' + env['CPU'] + '/' + env['VARIANT'] + '/dist' , PathVariable.PathIsDir))
+-vars.Add(PathVariable('AJTC_CORE_DIR', 'Location of the built AJ Thin Core directory',
+-                      '../../ajtcl', PathVariable.PathIsDir))
+ vars.Update(env)
+ Help(vars.GenerateHelpText(env))
+ 
