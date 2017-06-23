@@ -2,22 +2,22 @@
 
 #    Copyright (c) Open Connectivity Foundation (OCF), AllJoyn Open Source
 #    Project (AJOSP) Contributors and others.
-#    
+#
 #    SPDX-License-Identifier: Apache-2.0
-#    
+#
 #    All rights reserved. This program and the accompanying materials are
 #    made available under the terms of the Apache License, Version 2.0
 #    which accompanies this distribution, and is available at
 #    http://www.apache.org/licenses/LICENSE-2.0
-#    
+#
 #    Copyright (c) Open Connectivity Foundation and Contributors to AllSeen
 #    Alliance. All rights reserved.
-#    
+#
 #    Permission to use, copy, modify, and/or distribute this software for
 #    any purpose with or without fee is hereby granted, provided that the
 #    above copyright notice and this permission notice appear in all
 #    copies.
-#    
+#
 #    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
 #    WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
 #    WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
@@ -29,7 +29,7 @@
 #
 
 START=65
-
+USE_PROCD=1
 SERVICE_PID_FILE=/var/run/alljoyn.pid
 
 CONFIGFILE="/etc/alljoyn/alljoyn.conf"
@@ -145,8 +145,6 @@ generate_conf_file() {
 
     rm -f $GENCONFIGFILE
 
-    include /lib/network
-
     config_load alljoyn
 
     process_unix_transport
@@ -165,19 +163,28 @@ generate_conf_file() {
   <limit name="auth_timeout">${ip_auth_timeout}</limit>
   <limit name="max_incomplete_connections">${ip_max_incomplete_conn}</limit>
   <limit name="max_completed_connections">${ip_max_complete_conn}</limit>
-  <limit name="max_untrusted_clients">${ip_max_complete_conn}</limit>
 </busconfig>
 EOF
 }
 
 
-start() {
+start_service() {
+    . /lib/functions.sh
+    . /lib/functions/network.sh
+
     generate_conf_file
+
+    procd_open_instance
+
     if [ -e $CONFIGFILE ]; then
-        service_start /usr/bin/alljoyn-daemon --config-file=$CONFIGFILE
+         procd_set_param command /usr/bin/alljoyn-daemon --config-file=$CONFIGFILE
     fi
+
+    procd_set_param respawn
+
+    procd_close_instance
 }
 
-stop() {
-    service_stop /usr/bin/alljoyn-daemon
+service_triggers() {
+    procd_add_reload_trigger "alljoyn"
 }

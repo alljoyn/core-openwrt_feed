@@ -1,0 +1,5 @@
+#!/bin/sh
+
+/etc/init.d/alljoyn enabled && [ "$ACTION" = "ifup" ] && {
+    /etc/init.d/alljoyn restart
+}
