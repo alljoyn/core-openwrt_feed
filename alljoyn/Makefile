@@ -227,6 +227,8 @@ define Package/alljoyn/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/cpp/bin/alljoyn-daemon $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/cpp/lib/liballjoyn.so $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_BIN) ./files/75-alljoyn.ifup $(1)/etc/hotplug.d/iface/75-alljoyn
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/alljoyn.init $(1)/etc/init.d/alljoyn
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
